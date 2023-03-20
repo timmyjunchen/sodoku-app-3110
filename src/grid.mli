@@ -1,2 +1,1 @@
-type t
-(** The abstract type of values representing sudoku board. *)
+val print_block : int list list -> unit
