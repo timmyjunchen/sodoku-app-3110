@@ -16,7 +16,13 @@ let board1 : int list list =
   ]
 
 let grid_tests =
-  [ ({|print board test|} >:: fun _ -> assert_equal () (print_board board1)) ]
+  [
+    ({|print board test|} >:: fun _ -> assert_equal () (print_board board1));
+    ( {|row test|} >:: fun _ ->
+      assert_equal [ 2; 0; 0; 3; 0; 0; 0; 0; 0 ] (get_row board1 1) );
+    ( {|col test|} >:: fun _ ->
+      assert_equal [ 0; 0; 1; 0; 0; 3; 2; 0; 0 ] (get_col board1 2) );
+  ]
 
 let suite = "test suite for A2" >::: List.flatten [ grid_tests ]
 let _ = run_test_tt_main suite

@@ -22,3 +22,9 @@ let print_board (board : int list list) : unit =
   let result = List.fold_left ( ^ ) "" string_rows in
   let _ = print_endline result in
   ()
+
+let get_row (board : int list list) (rownum : int) = List.nth board (rownum - 1)
+
+let get_col (board : int list list) (colnum : int) =
+  List.fold_left ( @ ) []
+    (List.map (fun row -> [ List.nth row (colnum - 1) ]) board)
