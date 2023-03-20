@@ -1,1 +1,1 @@
-val print_block : int list list -> unit
+val print_board : int list list -> unit
