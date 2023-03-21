@@ -13,14 +13,14 @@ val init_state : Grid.t -> t
     on the starting grid. *)
 
 val current_grid : t -> int list list
-(** [current_grid st] is the identifier of the current grid state [st]. *)
+(** [current_grid st] is the identifier of the current board state [st]. *)
 
 (** The type representing the result of an attempted inserting number into box. *)
 type result =
   | Legal of t
   | Illegal
 
-val answer : int -> int -> int -> Grid.t -> t -> result
+(*val answer : int -> int -> int -> Grid.t -> t -> result *)
 (** [answer number grid st] is the result of attempting to answer with number
     [n] in box with row [row] and column [col] in state [st] and grid [grid]:
 
