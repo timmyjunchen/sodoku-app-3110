@@ -65,15 +65,27 @@ let get_cell (st : t) ((row, col) : int * int) : int =
 
 let check_input input = if 1 <= input && input <= 9 then true else false
 
+let replace lst row col value =
+  List.mapi
+    (fun i x ->
+      if i = row - 1 then
+        List.mapi
+          (fun j y -> if j = col - 1 then value else y)
+          (List.nth lst (row - 1))
+      else x)
+    lst
+
 let next_grid st row col value =
+  let current_board = current_board st in
   match get_cell st (row, col) with
-  | 0 -> raise (InvalidBox (row, col))
-  | exception _ -> raise (InvalidBox (row, col))
-  | _ -> begin
+  | 0 -> begin
       match check_input value with
+      | true -> replace current_board row col value
       | false -> raise (InvalidAnswer value)
-      |true ->
+      | exception _ -> raise (InvalidAnswer value)
     end
+  | exception _ -> raise (InvalidBox (row, col))
+  | _ -> raise (InvalidBox (row, col))
 
 type result =
   | Legal of t

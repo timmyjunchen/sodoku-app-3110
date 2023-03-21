@@ -40,6 +40,26 @@ let command_tests =
 let current_board_test name (state : State.t) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (current_board state)
 
+let next_grid_test name st row col value expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (next_grid st row col value)
+
+let next_grid_error_test name st row col value expected_error : test =
+  name >:: fun _ ->
+  assert_raises expected_error (fun () -> next_grid st row col value)
+
+let board1_grid_2_2_1 =
+  [
+    [ 2; 0; 0; 3; 0; 0; 0; 0; 0 ];
+    [ 8; 1; 4; 0; 6; 2; 0; 0; 3 ];
+    [ 0; 1; 3; 8; 0; 0; 2; 0; 0 ];
+    [ 0; 0; 0; 0; 2; 0; 3; 9; 0 ];
+    [ 5; 0; 7; 0; 0; 0; 6; 2; 1 ];
+    [ 0; 3; 2; 0; 0; 6; 0; 0; 0 ];
+    [ 0; 2; 0; 0; 0; 9; 1; 4; 0 ];
+    [ 6; 0; 1; 2; 5; 0; 8; 0; 9 ];
+    [ 0; 0; 0; 0; 0; 1; 0; 0; 2 ];
+  ]
+
 let state_tests =
   let board1_init = init_state board1 in
   [
@@ -58,6 +78,11 @@ let state_tests =
     );
     ({|cell test 1|} >:: fun _ -> assert_equal 0 (get_cell board1_init (6, 9)));
     ({|cell test 2|} >:: fun _ -> assert_equal 2 (get_cell board1_init (4, 5)));
+    next_grid_test "put 1 in row 2 col 2" board1_init 2 2 1 board1_grid_2_2_1;
+    next_grid_error_test "invalid row" board1_init 12 2 1 (InvalidBox (12, 2));
+    next_grid_error_test "invalid col" board1_init 2 12 1 (InvalidBox (2, 12));
+    next_grid_error_test "cell is filled" board1_init 1 1 1 (InvalidBox (1, 1));
+    next_grid_error_test "invalid answer" board1_init 2 2 10 (InvalidAnswer 10);
   ]
 
 let suite =

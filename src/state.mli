@@ -27,8 +27,9 @@ val print_board : t -> unit
 val get_row : t -> int -> int list
 val get_col : t -> int -> int list
 val get_block : t -> int * int -> int list
-
 val get_cell : t -> int * int -> int
+
+val next_grid : t -> int -> int -> int -> int list list
 (** [answer number grid st] is the result of attempting to answer with number
     [n] in box with row [row] and column [col] in state [st] and grid [grid]:
 
