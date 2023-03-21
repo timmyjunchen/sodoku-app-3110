@@ -60,6 +60,14 @@ let board1_grid_2_2_1 =
     [ 0; 0; 0; 0; 0; 1; 0; 0; 2 ];
   ]
 
+let answer_current_board_test name row col value st expected_output : test =
+  let new_current_board =
+    match answer row col value st with
+    | Legal new_state -> current_board new_state
+    | Illegal -> [] (*sudoku boards cant be empty*)
+  in
+  name >:: fun _ -> assert_equal expected_output new_current_board
+
 let state_tests =
   let board1_init = init_state board1 in
   [
@@ -78,11 +86,25 @@ let state_tests =
     );
     ({|cell test 1|} >:: fun _ -> assert_equal 0 (get_cell board1_init (6, 9)));
     ({|cell test 2|} >:: fun _ -> assert_equal 2 (get_cell board1_init (4, 5)));
+    (*next grid test*)
     next_grid_test "put 1 in row 2 col 2" board1_init 2 2 1 board1_grid_2_2_1;
+    (*next grid error tests*)
     next_grid_error_test "invalid row" board1_init 12 2 1 (InvalidBox (12, 2));
     next_grid_error_test "invalid col" board1_init 2 12 1 (InvalidBox (2, 12));
     next_grid_error_test "cell is filled" board1_init 1 1 1 (InvalidBox (1, 1));
     next_grid_error_test "invalid answer" board1_init 2 2 10 (InvalidAnswer 10);
+    (*current grid answer legal test*)
+    answer_current_board_test "board1 answer 1 in row 2 col 2" 2 2 1 board1_init
+      board1_grid_2_2_1
+    (*current grid answer illegal test*);
+    answer_current_board_test "board1 answer 1 in row 12 col 2" 12 2 1
+      board1_init [];
+    answer_current_board_test "board1 answer 1 in row 2 col 12" 2 12 1
+      board1_init [];
+    answer_current_board_test "board1 answer 10 in row 2 col 2" 2 2 10
+      board1_init [];
+    answer_current_board_test "board1 answer 1 in row 1 col 1" 1 1 1 board1_init
+      [];
   ]
 
 let suite =

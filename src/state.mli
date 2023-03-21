@@ -28,16 +28,15 @@ val get_row : t -> int -> int list
 val get_col : t -> int -> int list
 val get_block : t -> int * int -> int list
 val get_cell : t -> int * int -> int
-
 val next_grid : t -> int -> int -> int -> int list list
-(** [answer number grid st] is the result of attempting to answer with number
-    [n] in box with row [row] and column [col] in state [st] and grid [grid]:
+val answer : int -> int -> int -> t -> result
+(* [answer row col value grid st] is the result of attempting to answer with
+   number [n] in box with row [row] and column [col] in state [st]:
 
-    - If [n] is a valid integer (Between 1 and 9), and box with [row][col] is
-      empty, then the result is [Legal st'], where in [st'] the grid has updated
-      with the number filled in the box.
+   - If [n] is a valid integer (Between 1 and 9), and box with [row][col] is
+   empty, then the result is [Legal st'], where in [st'] the grid has updated
+   with the number filled in the box.
 
-    - Otherwise, the result is [Illegal].
+   - Otherwise, the result is [Illegal].
 
-    Effects: none. In particular, [answer] does not print anything. *)
-(*val answer : int -> int -> int -> Grid.t -> t -> result *)
+   Effects: none. In particular, [answer] does not print anything. *)
