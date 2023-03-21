@@ -1,3 +1,6 @@
+exception InvalidBox of string
+exception InvalidAnswer of string
+
 let rec _print_list lst =
   match lst with
   | [] -> ()
