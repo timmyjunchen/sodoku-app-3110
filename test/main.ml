@@ -31,8 +31,8 @@ let grid_tests =
 
 let command_tests =
   [
-    ( {|parse command place 5 2 3|} >:: fun _ ->
-      assert_equal (Move { value = 5; row = 2; col = 3 }) (parse "place 5 2 3")
+    ( {|parse command place 2 3 5|} >:: fun _ ->
+      assert_equal (Move { row = 2; col = 3; value = 5 }) (parse "place 2 3 5")
     );
   ]
 

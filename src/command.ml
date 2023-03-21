@@ -1,7 +1,7 @@
 type move_phrase = {
-  value : int;
   row : int;
   col : int;
+  value : int;
 }
 
 type command =
@@ -21,9 +21,9 @@ let parse (str : string) : command =
       let vals = List.map (fun x -> int_of_string x) t in
       Move
         {
-          value = List.nth vals 0;
-          row = List.nth vals 1;
-          col = List.nth vals 2;
+          row = List.nth vals 0;
+          col = List.nth vals 1;
+          value = List.nth vals 2;
         }
   | [ "quit" ] -> Quit
   | _ -> raise Malformed

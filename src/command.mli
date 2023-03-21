@@ -1,7 +1,7 @@
 type move_phrase = {
-  value : int;
   row : int;
   col : int;
+  value : int;
 }
 
 type command =
