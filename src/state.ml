@@ -1,7 +1,7 @@
 open Grid
 
-exception InvalidBox of string
-exception InvalidAnswer of string
+exception InvalidBox of int * int
+exception InvalidAnswer of int
 
 type t = { current_board : int list list }
 
@@ -62,6 +62,18 @@ let get_block (st : t) ((blockrow, blockcol) : int * int) : int list =
 
 let get_cell (st : t) ((row, col) : int * int) : int =
   List.nth (List.nth (current_board st) (row - 1)) (col - 1)
+
+let check_input input = if 1 <= input && input <= 9 then true else false
+
+let next_grid st row col value =
+  match get_cell st (row, col) with
+  | 0 -> raise (InvalidBox (row, col))
+  | exception _ -> raise (InvalidBox (row, col))
+  | _ -> begin
+      match check_input value with
+      | false -> raise (InvalidAnswer value)
+      |true ->
+    end
 
 type result =
   | Legal of t

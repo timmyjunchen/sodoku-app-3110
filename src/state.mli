@@ -4,8 +4,8 @@
     including the player's current grid, the boxes that have been filled, and
     functions that cause the state to change. *)
 
-exception InvalidBox of string
-exception InvalidAnswer of string
+exception InvalidBox of int * int
+exception InvalidAnswer of int
 
 type t
 (** The abstract type of values representing the game state. *)
