@@ -40,6 +40,8 @@ let grid_tests =
       assert_equal [ 2; 0; 0; 8; 0; 4; 0; 1; 3 ] (get_block board1 (1, 1)) );
     ( {|block test 2|} >:: fun _ ->
       assert_equal [ 0; 0; 9; 2; 5; 0; 0; 0; 1 ] (get_block board1 (3, 2)) );
+    ({|cell test 1|} >:: fun _ -> assert_equal 0 (get_cell board1 (6, 9)));
+    ({|cell test 2|} >:: fun _ -> assert_equal 2 (get_cell board1 (4, 5)));
   ]
 
 (*state tests*)

@@ -61,3 +61,6 @@ let get_block (board : t) ((blockrow, blockcol) : int * int) : int list =
              row
          else [])
        (current_board board))
+
+let get_cell (board : t) ((row, col) : int * int) : int =
+  List.nth (List.nth (current_board board) (row - 1)) (col - 1)

@@ -10,3 +10,4 @@ val print_board : t -> unit
 val get_row : t -> int -> int list
 val get_col : t -> int -> int list
 val get_block : t -> int * int -> int list
+val get_cell : t -> int * int -> int
