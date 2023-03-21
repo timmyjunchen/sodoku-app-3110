@@ -1,6 +1,10 @@
 exception InvalidBox of string
 exception InvalidAnswer of string
 
+type t = { board : int list list }
+
+let start_board board = board.board
+
 let rec _print_list lst =
   match lst with
   | [] -> ()

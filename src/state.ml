@@ -2,7 +2,7 @@ open Grid
 
 type t = { current_grid : int list list }
 
-let init_state board = { current_grid = print_board board }
+let init_state board = { current_grid = start_board board }
 let current_grid st = st.current_grid
 
 type result =
