@@ -38,8 +38,8 @@ let main () =
     ANSITerminal.print_string [ ANSITerminal.red ] str;
     print_endline
       "\n\
-       Please enter what move you want to make! To answer, type place [row] \
-       [col] [answer]\n";
+       Please enter what move you want to make! To answer, type place row col \
+       answer\n";
     print_string "> ";
     match read_line () with
     | exception End_of_file -> ()
