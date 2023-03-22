@@ -1,0 +1,8 @@
+update opam by typing the following in the command line
+$ opam update
+
+upgrade preinstalled packages by typing the following in the command line
+$ opam upgrade
+
+install ANSITerminal by typing the following in the command line
+$ opam install ANSITerminal
