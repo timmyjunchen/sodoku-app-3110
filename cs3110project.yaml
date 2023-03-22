@@ -1,0 +1,31 @@
+---
+# Members of your group.
+group:
+  - name: Alex Kim
+    netid: ajk338
+  - name: Mihir Mishra
+    netid: mrm367
+  - name: Timmy Li
+    netid: tl674
+# Your PM.
+pm:
+  name: Anirudh Sharma
+  netid: as2844
+# Set to false if you don't want your gallery entry to be public.
+publish: false
+# Pithy title
+title: "Sudoku on OCaml (SudOcaml)"
+# OK if this is a Cornell Github link, but public gallery viewers won't be able to see it.
+git-repo: "https://github.coecis.cornell.edu/tl674/cs3110-final-project"
+# If you have no demo screencast, replace the url string with an empty string ""
+demo-video-url: ""
+# Write a short, attention-grabbing description of your project.
+desc: >
+
+  Our project is an interactive sudoku board. It supports multiple difficulties 
+  (easy, medium, hard) which are auto generated randomly 
+  and will have a working interface where users can select
+  the cell they wish to fill. There is also a hint feature in case users are
+  stuck which will provide clues about which cells/numbers to focus on. There 
+  will also be a solver in case people want to see the solution or input their 
+  own boards. 
