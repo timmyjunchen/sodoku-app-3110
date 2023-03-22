@@ -1,13 +1,65 @@
+open Sudoku
+open Grid
+open State
+(* open Command *)
+
+let board1_grid =
+  [
+    [ 2; 0; 0; 3; 0; 0; 0; 0; 0 ];
+    [ 8; 0; 4; 0; 6; 2; 0; 0; 3 ];
+    [ 0; 1; 3; 8; 0; 0; 2; 0; 0 ];
+    [ 0; 0; 0; 0; 2; 0; 3; 9; 0 ];
+    [ 5; 0; 7; 0; 0; 0; 6; 2; 1 ];
+    [ 0; 3; 2; 0; 0; 6; 0; 0; 0 ];
+    [ 0; 2; 0; 0; 0; 9; 1; 4; 0 ];
+    [ 6; 0; 1; 2; 5; 0; 8; 0; 9 ];
+    [ 0; 0; 0; 0; 0; 1; 0; 0; 2 ];
+  ]
+
+let board1 = init_state (board_setup board1_grid)
+
 (** [play_game f] starts the adventure in file [f]. *)
-(*let play_game f = raise (Failure "Unimplemented: Main.play_game")
+(* let play_game () = init_state board1 *)
 
-  let data_dir_prefix = "data" ^ Filename.dir_sep
+(* let data_dir_prefix = "data" ^ Filename.dir_sep *)
 
-  (** [main ()] prompts for the game to play, then starts it. *) let main () =
-  ANSITerminal.print_string [ ANSITerminal.red ] "\n\nWelcome to the 3110 Text
-  Adventure Game engine.\n"; print_endline "Please enter the name of the game
-  file you want to load.\n"; print_string "> "; match read_line () with |
-  exception End_of_file -> () | file_name -> play_game (data_dir_prefix ^
-  file_name ^ ".json")
+(** [main ()] prompts for the game to play, then starts it. *)
+let main () =
+  let play board (cmd : Command.command) =
+    match cmd with
+    | Move phrase -> (
+        let rslt = answer phrase.col phrase.row phrase.value board in
+        match rslt with
+        | Legal brd -> brd
+        | Illegal ->
+            ANSITerminal.print_string [ ANSITerminal.red ]
+              "\n\nMove is Illegal, please try again. \n";
+            board)
+    | Quit -> Stdlib.exit 0
+  in
+  let rec prompt board =
+    ANSITerminal.print_string [] "\n\nHere is your Sodoku Board.\n";
+    print_board board;
+    print_endline "\nPlease enter what move you want to make!\n";
+    print_string "> ";
+    match read_line () with
+    | exception End_of_file -> ()
+    | str -> (
+        try Command.parse str |> play board |> prompt
+        with Command.Malformed ->
+          ANSITerminal.print_string [ ANSITerminal.red ]
+            "\n\nThat is not a valid command \n";
+          prompt board)
+  in
+  ANSITerminal.print_string [ ANSITerminal.red ]
+    "\n\nWelcome to the 3110 Text\n  Adventure Game engine.\n";
+  prompt board1
 
-  (* Execute the game engine. *) let () = main () *)
+(* ANSITerminal.print_string [ ANSITerminal.red ] "\n\nWelcome to the 3110
+   Text\n Adventure Game engine.\n"; print_endline "Please enter the name of the
+   game\n file you want to load.\n"; print_string "> "; match read_line () with
+   | exception End_of_file -> () | file_name -> play_game (data_dir_prefix ^
+   file_name ^ ".json") *)
+
+(* Execute the game engine. *)
+let () = main ()
