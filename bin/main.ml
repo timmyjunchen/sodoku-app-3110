@@ -25,11 +25,8 @@ let main () =
     | Move phrase -> (
         let rslt = answer phrase.row phrase.col phrase.value board in
         match rslt with
-        | Legal brd -> brd
-        | Illegal ->
-            ANSITerminal.print_string [ ANSITerminal.red ]
-              "\n\nMove is Illegal, please try again. \n";
-            board)
+        | Legal brd -> ("Valid move. Nice!", brd)
+        | Illegal -> ("\n\nMove is Illegal, please try again. \n", board))
     | Quit -> Stdlib.exit 0
   in
   let rec prompt str board =
@@ -38,13 +35,16 @@ let main () =
     ANSITerminal.print_string [ ANSITerminal.red ] str;
     print_endline
       "\n\
-       Please enter what move you want to make! To answer, type place row col \
-       answer\n";
+       Please enter what move you want to make! To answer, type place [row] \
+       [col] [answer]\n";
     print_string "> ";
     match read_line () with
     | exception End_of_file -> ()
     | str -> (
-        try Command.parse str |> play board |> prompt "Valid move. Nice!"
+        try
+          let x = Command.parse str |> play board in
+          match x with
+          | str, brd -> prompt str brd
         with Command.Malformed ->
           prompt
             "\n\n\
