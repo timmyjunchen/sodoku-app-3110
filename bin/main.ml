@@ -18,17 +18,12 @@ let board1_grid =
 
 let board1 = init_state (board_setup board1_grid)
 
-(** [play_game f] starts the adventure in file [f]. *)
-(* let play_game () = init_state board1 *)
-
-(* let data_dir_prefix = "data" ^ Filename.dir_sep *)
-
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
   let play board (cmd : Command.command) =
     match cmd with
     | Move phrase -> (
-        let rslt = answer phrase.col phrase.row phrase.value board in
+        let rslt = answer phrase.row phrase.col phrase.value board in
         match rslt with
         | Legal brd -> brd
         | Illegal ->
