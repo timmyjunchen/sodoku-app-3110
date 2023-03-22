@@ -40,7 +40,10 @@ let main () =
   let rec prompt board =
     ANSITerminal.print_string [] "\n\nHere is your Sodoku Board.\n";
     print_board board;
-    print_endline "\nPlease enter what move you want to make!\n";
+    print_endline
+      "\n\
+       Please enter what move you want to make! To answer, type place [row] \
+       [col] [answer]\n";
     print_string "> ";
     match read_line () with
     | exception End_of_file -> ()
@@ -52,14 +55,8 @@ let main () =
           prompt board)
   in
   ANSITerminal.print_string [ ANSITerminal.red ]
-    "\n\nWelcome to the 3110 Text\n  Adventure Game engine.\n";
+    "\n\nWelcome to the 3110 Text\n Sudoku Game engine.\n";
   prompt board1
-
-(* ANSITerminal.print_string [ ANSITerminal.red ] "\n\nWelcome to the 3110
-   Text\n Adventure Game engine.\n"; print_endline "Please enter the name of the
-   game\n file you want to load.\n"; print_string "> "; match read_line () with
-   | exception End_of_file -> () | file_name -> play_game (data_dir_prefix ^
-   file_name ^ ".json") *)
 
 (* Execute the game engine. *)
 let () = main ()
