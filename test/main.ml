@@ -5,17 +5,17 @@ open State
 open Command
 
 let board1_grid =
-  [
-    [ 2; 0; 0; 3; 0; 0; 0; 0; 0 ];
-    [ 8; 0; 4; 0; 6; 2; 0; 0; 3 ];
-    [ 0; 1; 3; 8; 0; 0; 2; 0; 0 ];
-    [ 0; 0; 0; 0; 2; 0; 3; 9; 0 ];
-    [ 5; 0; 7; 0; 0; 0; 6; 2; 1 ];
-    [ 0; 3; 2; 0; 0; 6; 0; 0; 0 ];
-    [ 0; 2; 0; 0; 0; 9; 1; 4; 0 ];
-    [ 6; 0; 1; 2; 5; 0; 8; 0; 9 ];
-    [ 0; 0; 0; 0; 0; 1; 0; 0; 2 ];
-  ]
+  [|
+    [| 2; 0; 0; 3; 0; 0; 0; 0; 0 |];
+    [| 8; 0; 4; 0; 6; 2; 0; 0; 3 |];
+    [| 0; 1; 3; 8; 0; 0; 2; 0; 0 |];
+    [| 0; 0; 0; 0; 2; 0; 3; 9; 0 |];
+    [| 5; 0; 7; 0; 0; 0; 6; 2; 1 |];
+    [| 0; 3; 2; 0; 0; 6; 0; 0; 0 |];
+    [| 0; 2; 0; 0; 0; 9; 1; 4; 0 |];
+    [| 6; 0; 1; 2; 5; 0; 8; 0; 9 |];
+    [| 0; 0; 0; 0; 0; 1; 0; 0; 2 |];
+  |]
 
 let board1 = board_setup board1_grid
 
@@ -48,23 +48,23 @@ let next_grid_error_test name st row col value expected_error : test =
   assert_raises expected_error (fun () -> next_grid st row col value)
 
 let board1_grid_2_2_1 =
-  [
-    [ 2; 0; 0; 3; 0; 0; 0; 0; 0 ];
-    [ 8; 1; 4; 0; 6; 2; 0; 0; 3 ];
-    [ 0; 1; 3; 8; 0; 0; 2; 0; 0 ];
-    [ 0; 0; 0; 0; 2; 0; 3; 9; 0 ];
-    [ 5; 0; 7; 0; 0; 0; 6; 2; 1 ];
-    [ 0; 3; 2; 0; 0; 6; 0; 0; 0 ];
-    [ 0; 2; 0; 0; 0; 9; 1; 4; 0 ];
-    [ 6; 0; 1; 2; 5; 0; 8; 0; 9 ];
-    [ 0; 0; 0; 0; 0; 1; 0; 0; 2 ];
-  ]
+  [|
+    [| 2; 0; 0; 3; 0; 0; 0; 0; 0 |];
+    [| 8; 1; 4; 0; 6; 2; 0; 0; 3 |];
+    [| 0; 1; 3; 8; 0; 0; 2; 0; 0 |];
+    [| 0; 0; 0; 0; 2; 0; 3; 9; 0 |];
+    [| 5; 0; 7; 0; 0; 0; 6; 2; 1 |];
+    [| 0; 3; 2; 0; 0; 6; 0; 0; 0 |];
+    [| 0; 2; 0; 0; 0; 9; 1; 4; 0 |];
+    [| 6; 0; 1; 2; 5; 0; 8; 0; 9 |];
+    [| 0; 0; 0; 0; 0; 1; 0; 0; 2 |];
+  |]
 
 let answer_current_board_test name row col value st expected_output : test =
   let new_current_board =
     match answer row col value st with
     | Legal new_state -> current_board new_state
-    | Illegal -> [] (*sudoku boards cant be empty*)
+    | Illegal -> [||] (*sudoku boards cant be empty*)
   in
   name >:: fun _ -> assert_equal expected_output new_current_board
 
@@ -75,15 +75,17 @@ let state_tests =
     current_board_test "board 1 initial state" board1_init board1_grid;
     ({|print board test|} >:: fun _ -> assert_equal () (print_board board1_init));
     ( {|row test|} >:: fun _ ->
-      assert_equal [ 2; 0; 0; 3; 0; 0; 0; 0; 0 ] (get_row board1_init 1) );
+      assert_equal [| 2; 0; 0; 3; 0; 0; 0; 0; 0 |] (get_row board1_init 1) );
     ( {|col test|} >:: fun _ ->
-      assert_equal [ 0; 0; 1; 0; 0; 3; 2; 0; 0 ] (get_col board1_init 2) );
+      assert_equal [| 0; 0; 1; 0; 0; 3; 2; 0; 0 |] (get_col board1_init 2) );
     ( {|block test 1|} >:: fun _ ->
-      assert_equal [ 2; 0; 0; 8; 0; 4; 0; 1; 3 ] (get_block board1_init (1, 1))
-    );
+      assert_equal
+        [| 2; 0; 0; 8; 0; 4; 0; 1; 3 |]
+        (get_block board1_init (1, 1)) );
     ( {|block test 2|} >:: fun _ ->
-      assert_equal [ 0; 0; 9; 2; 5; 0; 0; 0; 1 ] (get_block board1_init (3, 2))
-    );
+      assert_equal
+        [| 0; 0; 9; 2; 5; 0; 0; 0; 1 |]
+        (get_block board1_init (3, 2)) );
     ({|cell test 1|} >:: fun _ -> assert_equal 0 (get_cell board1_init (6, 9)));
     ({|cell test 2|} >:: fun _ -> assert_equal 2 (get_cell board1_init (4, 5)));
     (*next grid test*)
@@ -98,13 +100,13 @@ let state_tests =
       board1_grid_2_2_1
     (*current grid answer illegal test*);
     answer_current_board_test "board1 answer 1 in row 12 col 2" 12 2 1
-      board1_init [];
+      board1_init [||];
     answer_current_board_test "board1 answer 1 in row 2 col 12" 2 12 1
-      board1_init [];
+      board1_init [||];
     answer_current_board_test "board1 answer 10 in row 2 col 2" 2 2 10
-      board1_init [];
+      board1_init [||];
     answer_current_board_test "board1 answer 1 in row 1 col 1" 1 1 1 board1_init
-      [];
+      [||];
   ]
 
 let suite =
