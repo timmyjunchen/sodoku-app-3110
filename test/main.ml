@@ -3,6 +3,7 @@ open Sudoku
 open Grid
 open State
 open Command
+open Boardmaker
 
 let board1_grid =
   [|
@@ -127,8 +128,16 @@ let state_tests =
       [||];
   ]
 
+let boardmaker_tests =
+  [
+    ( {|shuffle list|} >:: fun _ ->
+      assert (
+        shuffle [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] <> [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ])
+    );
+  ]
+
 let suite =
   "test suite for A2"
-  >::: List.flatten [ grid_tests; command_tests; state_tests ]
+  >::: List.flatten [ grid_tests; command_tests; state_tests; boardmaker_tests ]
 
 let _ = run_test_tt_main suite
