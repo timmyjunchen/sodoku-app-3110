@@ -90,31 +90,35 @@ let check_valid board row col =
   let col_set = ref SS.empty in
   let flag = ref true in
   for i = 0 to 8 do
-    if SS.mem arr.(row).(i) !row_set then flag := false
+    if arr.(row).(i) <> 0 && SS.mem arr.(row).(i) !row_set then flag := false
     else row_set := SS.add arr.(row).(i) !row_set
   done;
   for i = 0 to 8 do
-    if SS.mem arr.(col).(i) !col_set then flag := false
-    else col_set := SS.add arr.(col).(i) !col_set
+    if arr.(i).(col) <> 0 && SS.mem arr.(i).(col) !col_set then flag := false
+    else col_set := SS.add arr.(i).(col) !col_set
   done;
   !flag
 
 let solve_board brd =
-  let board = brd.current_board in
-  let rec helper board =
-    try
-      for row = 0 to 8 do
-        for col = 0 to 8 do
-          if row == 8 && col == 8 then raise Exit
-          else if board.(row).(col) == 0 then
-            for i = 1 to 9 do
-              board.(row).(col) <- i;
-              if check_valid board row col then helper board else ()
-            done
-          else ()
-        done
-      done
-    with Exit -> ()
+  let board_curr = brd.current_board in
+  let rec helper row col board =
+    if row == 8 && col == 8 then raise Exit
+    else if board.(row).(col) == 0 then (
+      for i = 1 to 9 do
+        board.(row).(col) <- i;
+        if check_valid board row col then
+          if col == 8 then helper (row + 1) 0 board
+          else helper row (col + 1) board
+        else ()
+      done;
+      board.(row).(col) <- 0)
+    else if col == 8 then helper (row + 1) 0 board
+    else helper row (col + 1) board
   in
-  helper board;
-  brd
+  try
+    helper 0 0 board_curr;
+    raise Not_found
+  with Exit ->
+    ();
+    print_board brd;
+    brd
