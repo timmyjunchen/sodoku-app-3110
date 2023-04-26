@@ -81,3 +81,40 @@ let answer row col value st =
     let st' = { current_board = new_grid } in
     Legal st'
   with InvalidBox _ | InvalidAnswer _ -> Illegal
+
+module SS = Set.Make (Int)
+
+let check_valid board row col =
+  let arr = board in
+  let row_set = ref SS.empty in
+  let col_set = ref SS.empty in
+  let flag = ref true in
+  for i = 0 to 8 do
+    if SS.mem arr.(row).(i) !row_set then flag := false
+    else row_set := SS.add arr.(row).(i) !row_set
+  done;
+  for i = 0 to 8 do
+    if SS.mem arr.(col).(i) !col_set then flag := false
+    else col_set := SS.add arr.(col).(i) !col_set
+  done;
+  !flag
+
+let solve_board brd =
+  let board = brd.current_board in
+  let rec helper board =
+    try
+      for row = 0 to 8 do
+        for col = 0 to 8 do
+          if row == 8 && col == 8 then raise Exit
+          else if board.(row).(col) == 0 then
+            for i = 1 to 9 do
+              board.(row).(col) <- i;
+              if check_valid board row col then helper board else ()
+            done
+          else ()
+        done
+      done
+    with Exit -> ()
+  in
+  helper board;
+  brd
