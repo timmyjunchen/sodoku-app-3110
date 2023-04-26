@@ -1,12 +1,15 @@
-open Grid
 (*open Printf*)
 
 exception InvalidBox of int * int
 exception InvalidAnswer of int
 
-type t = { current_board : int array array }
+type t = {
+  start_board : int array array;
+  current_board : int array array;
+}
 
-let init_state board = { current_board = start_board board }
+let init_state board = { start_board = board; current_board = board }
+let start_board st = st.start_board
 let current_board st = st.current_board
 (*let rec _print_array arr = Array.iter (printf "%d ") arr*)
 
@@ -46,24 +49,38 @@ let get_col (st : t) (colnum : int) : int array =
 let get_block (st : t) ((blockrow, blockcol) : int * int) : int array =
   let grid_edge = Array.length (current_board st) in
   let block_edge = int_of_float (sqrt (float_of_int grid_edge)) in
-  Array.init grid_edge (fun cell ->
-      let row_value = ((blockrow - 1) * block_edge) + (cell / block_edge) in
-      let col_value = ((blockcol - 1) * block_edge) + (cell mod block_edge) in
-      (current_board st).(row_value).(col_value))
+  let result =
+    Array.init grid_edge (fun cell ->
+        let row_value = ((blockrow - 1) * block_edge) + (cell / block_edge) in
+        let col_value = ((blockcol - 1) * block_edge) + (cell mod block_edge) in
+        (current_board st).(row_value).(col_value))
+  in
+  let _ =
+    print_endline
+      (List.fold_left
+         (fun acc x -> acc ^ string_of_int x)
+         "" (result |> Array.to_list))
+  in
+  result
 
 let get_cell (st : t) ((row, col) : int * int) : int =
+  (* let _ = print_endline (string_of_int row ^ string_of_int col) in let _ =
+     print_endline (string_of_int (current_board st).(1).(1)) in *)
   (current_board st).(row - 1).(col - 1)
 
 let check_input input = 1 <= input && input <= 9
-let replace arr row col value = arr.(row - 1).(col - 1) <- value
+(* let replace arr row col value = arr.(row - 1).(col - 1) <- value *)
 
 let next_grid st row col value =
   let current_board = current_board st in
+  (* let _ = get_cell st (row, col) |> string_of_int |> print_endline in *)
+  let _ = print_board st in
   match get_cell st (row, col) with
   | 0 -> begin
       match check_input value with
       | true ->
-          replace current_board row col value;
+          (* replace current_board row col value; *)
+          current_board.(row - 1).(col - 1) <- value;
           current_board
       | false -> raise (InvalidAnswer value)
       | exception _ -> raise (InvalidAnswer value)
@@ -78,6 +95,6 @@ type result =
 let answer row col value st =
   try
     let new_grid = next_grid st row col value in
-    let st' = { current_board = new_grid } in
+    let st' = { start_board = start_board st; current_board = new_grid } in
     Legal st'
   with InvalidBox _ | InvalidAnswer _ -> Illegal

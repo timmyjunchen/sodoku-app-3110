@@ -10,10 +10,13 @@ exception InvalidAnswer of int
 type t
 (** The abstract type of values representing the game state. *)
 
-val init_state : Grid.t -> t
+val init_state : int array array -> t
 (** [init_state g] is the initial state of the game when playing the sudoku grid
     [g] game. In that state the player has not yet filled out any boxes and is
     on the starting grid. *)
+
+val start_board : t -> int array array
+(** [start_board st] is the identifier of the start board state [st]. *)
 
 val current_board : t -> int array array
 (** [current_board st] is the identifier of the current board state [st]. *)
