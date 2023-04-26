@@ -33,6 +33,7 @@ val get_block : t -> int * int -> int array
 val get_cell : t -> int * int -> int
 val next_grid : t -> int -> int -> int -> int array array
 val answer : int -> int -> int -> t -> result
+
 (* [answer row col value grid st] is the result of attempting to answer with
    number [n] in box with row [row] and column [col] in state [st]:
 
@@ -43,3 +44,4 @@ val answer : int -> int -> int -> t -> result
    - Otherwise, the result is [Illegal].
 
    Effects: none. In particular, [answer] does not print anything. *)
+val solve_board : t -> t
