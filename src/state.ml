@@ -99,6 +99,13 @@ let answer row col value st =
     Legal st'
   with InvalidBox _ | InvalidAnswer _ -> Illegal
 
+let delete row col st =
+  try
+    let new_grid = next_grid st row col 0 in
+    let st' = { start_board = start_board st; current_board = new_grid } in
+    Legal st'
+  with InvalidBox _ | InvalidAnswer _ -> Illegal
+
 module SS = Set.Make (Int)
 
 let check_valid board row col =

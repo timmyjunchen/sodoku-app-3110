@@ -1,6 +1,5 @@
 open OUnit2
 open Sudoku
-open Grid
 open State
 open Command
 open Boardmaker
@@ -31,8 +30,8 @@ let board2_grid =
     [| 0; 0; 0; 0; 0; 1; 0; 0; 2 |];
   |]
 
-let board1 = board_setup board1_grid
-let board2 = board_setup board2_grid
+let board1 = init_state board1_grid
+let board2 = init_state board2_grid
 
 (*adventure tests*)
 let start_board_test name adv expected_output : test =
@@ -84,12 +83,12 @@ let answer_current_board_test name row col value st expected_output : test =
   name >:: fun _ -> assert_equal expected_output new_current_board
 
 let state_tests =
-  let board1_init = init_state board1 in
+  let board1_init = board1 in
   [
     ( "Board Solver Test" >:: fun _ ->
-      assert_equal (init_state board2)
-        (print_board (init_state board2);
-         solve_board (init_state board2)) );
+      assert_equal board2
+        (print_board board2;
+         solve_board board2) );
     (*current board test*)
     current_board_test "board 1 initial state" board1_init board1_grid;
     ({|print board test|} >:: fun _ -> assert_equal () (print_board board1_init));
