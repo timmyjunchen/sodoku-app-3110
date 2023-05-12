@@ -145,6 +145,18 @@ let check_valid board row col =
   done;
   !flag
 
+let check_win board =
+  let win = ref true in
+  for i = 0 to 8 do
+    for j = 0 to 8 do
+      if
+        board.current_board.(i).(j) == 0
+        || not (check_valid board.current_board i j)
+      then win := false
+    done
+  done;
+  !win
+
 let solve_board brd =
   let board_curr = brd.current_board in
   let rec helper row col board =
@@ -166,5 +178,4 @@ let solve_board brd =
     raise Not_found
   with Exit ->
     ();
-    print_board brd;
     brd

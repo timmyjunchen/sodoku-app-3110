@@ -12,6 +12,7 @@ type move_phrase = {
 type command =
   | Move of move_phrase
   | Delete of coordinates
+  | Solve
   | Quit
 
 exception Empty

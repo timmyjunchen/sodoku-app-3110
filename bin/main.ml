@@ -32,12 +32,15 @@ let main () =
         | Legal brd -> ("Value deleted!", brd)
         | Illegal ->
             ("\n\nCannot delete values in that cell. Try Again \n", board))
+    | Solve -> ("\n\n Here is your solved board", solve_board board)
     | Quit -> Stdlib.exit 0
   in
   let rec prompt str board =
     ANSITerminal.print_string [] "\n\nHere is your Sodoku Board.\n";
     print_board board;
-    ANSITerminal.print_string [ ANSITerminal.red ] str;
+    if check_win board then
+      ANSITerminal.print_string [ ANSITerminal.red ] "You win!!"
+    else ANSITerminal.print_string [ ANSITerminal.red ] str;
     print_endline
       "\n\
        Please enter what move you want to make! To answer, type place [row] \

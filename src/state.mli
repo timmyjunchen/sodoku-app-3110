@@ -45,4 +45,6 @@ val delete : int -> int -> t -> result
    - Otherwise, the result is [Illegal].
 
    Effects: none. In particular, [answer] does not print anything. *)
+
+val check_win : t -> bool
 val solve_board : t -> t
