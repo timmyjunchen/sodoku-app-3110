@@ -104,32 +104,6 @@ let valid_place board row col num =
     || List.mem num (Array.to_list (get_col board (col + 1)))
     || List.mem num (Array.to_list (get_row board (row + 1))))
 
-(* let fill_pos board row col = let rand_9_lst = [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ]
-   in let i = ref 0 in while board.(row).(col) = 0 || !i < 9 do let _ =
-   print_endline (string_of_int (List.nth rand_9_lst !i) ^ " " ^ string_of_bool
-   (valid_place board row col (List.nth rand_9_lst !i))) in if valid_place board
-   row col (List.nth rand_9_lst !i) then board.(row).(col) <- List.nth
-   rand_9_lst !i else i := !i + 1 done
-
-   let empty_board = [| [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0;
-   0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [|
-   0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0;
-   0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0;
-   0 |]; |]
-
-   let has_empty board = Array.exists (fun row -> Array.exists (fun x -> x = 0)
-   row) board *)
-
-(* let rec generate_board_h board result = let num_lst = [ 1; 2; 3; 4; 5; 6; 7;
-   8; 9 ] in for row = 0 to 8 do for col = 0 to 8 do if board.(row).(col) = 0
-   then let shuffled_lst = shuffle num_lst in for i = 0 to 8 do if valid_place
-   board row col (List.nth shuffled_lst i) then board.(row).(col) <- List.nth
-   shuffled_lst i; if not (has_empty board) then let result = true else if
-   generate_board_h board then true else false done done done
-
-   let generate_board () = let b = Array.copy empty_board in let _ =
-   generate_board_h b false in b *)
-
 let generate_board () =
   let board = generate_random_diagonal () in
   ();
