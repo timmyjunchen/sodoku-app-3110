@@ -1,5 +1,4 @@
 open Sudoku
-open Grid
 open State
 (* open Command *)
 
@@ -16,7 +15,7 @@ let board1_grid =
     [| 0; 0; 0; 0; 0; 1; 0; 0; 2 |];
   |]
 
-let board1 = init_state (board_setup board1_grid)
+let board1 = init_state board1_grid
 
 (** [main ()] prompts for the game to play, then starts it. *)
 let main () =
@@ -27,6 +26,12 @@ let main () =
         match rslt with
         | Legal brd -> ("Valid move. Nice!", brd)
         | Illegal -> ("\n\nMove is Illegal, please try again. \n", board))
+    | Delete coords -> (
+        let rslt = delete coords.row coords.col board in
+        match rslt with
+        | Legal brd -> ("Value deleted!", brd)
+        | Illegal ->
+            ("\n\nCannot delete values in that cell. Try Again \n", board))
     | Quit -> Stdlib.exit 0
   in
   let rec prompt str board =
@@ -37,6 +42,7 @@ let main () =
       "\n\
        Please enter what move you want to make! To answer, type place [row] \
        [col] [answer]\n";
+    print_endline "\nYou can delete entries by typing delete [row] [col] \n";
     print_string "> ";
     match read_line () with
     | exception End_of_file -> ()
@@ -49,8 +55,8 @@ let main () =
           prompt
             "\n\n\
              That is not a valid command \n\
-             Make sure to style commands in the form of 'place row col val' or \
-             'quit'"
+             Make sure to style commands in the form of 'place row col val', \
+             'delete row col', or 'quit'"
             board)
   in
   ANSITerminal.print_string [ ANSITerminal.red ]

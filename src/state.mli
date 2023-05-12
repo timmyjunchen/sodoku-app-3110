@@ -15,7 +15,7 @@ val init_state : int array array -> t
     [g] game. In that state the player has not yet filled out any boxes and is
     on the starting grid. *)
 
-val start_board : t -> int array array
+val start_board : t -> int list
 (** [start_board st] is the identifier of the start board state [st]. *)
 
 val current_board : t -> int array array
@@ -33,6 +33,7 @@ val get_block : t -> int * int -> int array
 val get_cell : t -> int * int -> int
 val next_grid : t -> int -> int -> int -> int array array
 val answer : int -> int -> int -> t -> result
+val delete : int -> int -> t -> result
 
 (* [answer row col value grid st] is the result of attempting to answer with
    number [n] in box with row [row] and column [col] in state [st]:

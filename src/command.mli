@@ -1,3 +1,8 @@
+type coordinates = {
+  row : int;
+  col : int;
+}
+
 type move_phrase = {
   row : int;
   col : int;
@@ -6,6 +11,7 @@ type move_phrase = {
 
 type command =
   | Move of move_phrase
+  | Delete of coordinates
   | Quit
 
 exception Empty

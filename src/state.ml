@@ -4,13 +4,18 @@ exception InvalidBox of int * int
 exception InvalidAnswer of int
 
 type t = {
-  start_board : int array array;
+  start_board : int list;
   current_board : int array array;
 }
 
-let init_state board = { start_board = board; current_board = board }
+let flatten_nested arr = Array.(concat (to_list arr))
+
+let init_state board =
+  { start_board = Array.to_list (flatten_nested board); current_board = board }
+
 let start_board st = st.start_board
 let current_board st = st.current_board
+let size st = Array.length st.current_board
 (*let rec _print_array arr = Array.iter (printf "%d ") arr*)
 
 let print_board (st : t) : unit =
@@ -71,6 +76,17 @@ let get_cell (st : t) ((row, col) : int * int) : int =
 let check_input input = 1 <= input && input <= 9
 (* let replace arr row col value = arr.(row - 1).(col - 1) <- value *)
 
+let unchanged (st : t) ((row, col) : int * int) : bool =
+  let start_coords =
+    List.nth (start_board st) ((size st * (row - 1)) + col - 1)
+  in
+  get_cell st (row, col) == start_coords
+
+let replace_value (board : int array array) ((row, col) : int * int)
+    (value : int) : int array array =
+  board.(row - 1).(col - 1) <- value;
+  board
+
 let next_grid st row col value =
   let current_board = current_board st in
   (* let _ = get_cell st (row, col) |> string_of_int |> print_endline in *)
@@ -78,12 +94,18 @@ let next_grid st row col value =
   match get_cell st (row, col) with
   | 0 -> begin
       match check_input value with
-      | true ->
-          (* replace current_board row col value; *)
-          current_board.(row - 1).(col - 1) <- value;
-          current_board
-      | false -> raise (InvalidAnswer value)
-      | exception _ -> raise (InvalidAnswer value)
+      | true -> replace_value current_board (row, col) value
+      | false -> (
+          match value with
+          | 0 -> raise (InvalidBox (row, col))
+          | _ -> raise (InvalidAnswer value)
+          | exception _ -> raise (InvalidAnswer value))
+    end
+  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 -> begin
+      match unchanged st (row, col) with
+      | true -> raise (InvalidBox (row, col))
+      | false -> replace_value current_board (row, col) value
+      | exception _ -> raise (InvalidBox (row, col))
     end
   | exception _ -> raise (InvalidBox (row, col))
   | _ -> raise (InvalidBox (row, col))
@@ -95,7 +117,14 @@ type result =
 let answer row col value st =
   try
     let new_grid = next_grid st row col value in
-    let st' = { start_board = start_board st; current_board = new_grid } in
+    let st' = { st with current_board = new_grid } in
+    Legal st'
+  with InvalidBox _ | InvalidAnswer _ -> Illegal
+
+let delete row col st =
+  try
+    let new_grid = next_grid st row col 0 in
+    let st' = { st with current_board = new_grid } in
     Legal st'
   with InvalidBox _ | InvalidAnswer _ -> Illegal
 
@@ -107,31 +136,35 @@ let check_valid board row col =
   let col_set = ref SS.empty in
   let flag = ref true in
   for i = 0 to 8 do
-    if SS.mem arr.(row).(i) !row_set then flag := false
+    if arr.(row).(i) <> 0 && SS.mem arr.(row).(i) !row_set then flag := false
     else row_set := SS.add arr.(row).(i) !row_set
   done;
   for i = 0 to 8 do
-    if SS.mem arr.(col).(i) !col_set then flag := false
-    else col_set := SS.add arr.(col).(i) !col_set
+    if arr.(i).(col) <> 0 && SS.mem arr.(i).(col) !col_set then flag := false
+    else col_set := SS.add arr.(i).(col) !col_set
   done;
   !flag
 
 let solve_board brd =
-  let board = brd.current_board in
-  let rec helper board =
-    try
-      for row = 0 to 8 do
-        for col = 0 to 8 do
-          if row == 8 && col == 8 then raise Exit
-          else if board.(row).(col) == 0 then
-            for i = 1 to 9 do
-              board.(row).(col) <- i;
-              if check_valid board row col then helper board else ()
-            done
-          else ()
-        done
-      done
-    with Exit -> ()
+  let board_curr = brd.current_board in
+  let rec helper row col board =
+    if row == 8 && col == 8 then raise Exit
+    else if board.(row).(col) == 0 then (
+      for i = 1 to 9 do
+        board.(row).(col) <- i;
+        if check_valid board row col then
+          if col == 8 then helper (row + 1) 0 board
+          else helper row (col + 1) board
+        else ()
+      done;
+      board.(row).(col) <- 0)
+    else if col == 8 then helper (row + 1) 0 board
+    else helper row (col + 1) board
   in
-  helper board;
-  brd
+  try
+    helper 0 0 board_curr;
+    raise Not_found
+  with Exit ->
+    ();
+    print_board brd;
+    brd
