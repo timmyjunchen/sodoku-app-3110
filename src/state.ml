@@ -17,6 +17,12 @@ let deep_copy_board board =
   done;
   new_board
 
+let deep_copy_state st =
+  {
+    start_board = deep_copy_board st.start_board;
+    current_board = deep_copy_board st.current_board;
+  }
+
 let init_state board =
   { start_board = deep_copy_board board; current_board = board }
 

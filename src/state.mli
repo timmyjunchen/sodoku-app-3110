@@ -26,6 +26,8 @@ type result =
   | Legal of t
   | Illegal
 
+val deep_copy_board : int array array -> int array array
+val deep_copy_state : t -> t
 val print_board : t -> unit
 val get_row : t -> int -> int array
 val get_col : t -> int -> int array
