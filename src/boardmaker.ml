@@ -7,28 +7,15 @@ let shuffle lst =
   let shuffled =
     List.sort (fun e1 e2 -> if fst e1 < fst e2 then -1 else 1) assoc
   in
-  let _ =
-    print_endline
-      (List.fold_left
-         (fun acc x ->
-           acc ^ " " ^ string_of_int (fst x) ^ "," ^ string_of_int (snd x))
-         "" shuffled)
-  in
-  let result = List.map (fun e -> snd e) shuffled in
-  result
-(* let shuffle d = Random.self_init (); let nd = List.map (fun c -> (Random.bits
-   (), c)) d in let sond = List.sort compare nd in List.map snd sond *)
+  List.map (fun e -> snd e) shuffled
 
 let fill_box_with_lst board box_row box_col lst =
-  print_endline (List.fold_left (fun acc x -> acc ^ string_of_int x) "" lst);
   for row = (box_row - 1) * 3 to ((box_row - 1) * 3) + 2 do
     for col = (box_col - 1) * 3 to ((box_col - 1) * 3) + 2 do
       board.(row).(col) <- List.nth lst ((row mod 3 * 3) + (col mod 3))
     done
   done;
   board
-
-(* let random_9_lst = shuffle [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] *)
 
 let print_board (board : int array array) : unit =
   let _ = print_endline "" in
@@ -70,12 +57,80 @@ let generate_random_diagonal () =
     |]
   in
   for b = 1 to 3 do
-    (* let _ = Random.self_init () in *)
     let _ =
       fill_box_with_lst empty_board b b (shuffle [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ])
     in
     ()
   done;
-  print_endline "DIAGONALIZED BOARD";
   print_board empty_board;
   empty_board
+
+let get_row board (rownum : int) : int array = board.(rownum - 1)
+
+let get_col board (colnum : int) : int array =
+  Array.init (Array.length board) (fun row -> board.(row).(colnum - 1))
+
+let get_block board ((blockrow, blockcol) : int * int) : int array =
+  let grid_edge = Array.length board in
+  let block_edge = int_of_float (sqrt (float_of_int grid_edge)) in
+  let result =
+    Array.init grid_edge (fun cell ->
+        let row_value = ((blockrow - 1) * block_edge) + (cell / block_edge) in
+        let col_value = ((blockcol - 1) * block_edge) + (cell mod block_edge) in
+        board.(row_value).(col_value))
+  in
+  (* let _ = print_endline (List.fold_left (fun acc x -> acc ^ string_of_int x)
+     "" (Array.to_list result)) in *)
+  result
+
+let valid_place board row col num =
+  let _ =
+    print_endline
+      (string_of_bool
+         (List.mem num
+            (Array.to_list (get_block board (1 + (row / 3), 1 + (col / 3))))))
+  in
+  let _ =
+    print_endline
+      (string_of_bool (List.mem num (Array.to_list (get_col board (col + 1)))))
+  in
+  let _ =
+    print_endline
+      (string_of_bool (List.mem num (Array.to_list (get_row board (row + 1)))))
+  in
+  not
+    (List.mem num
+       (Array.to_list (get_block board (1 + (row / 3), 1 + (col / 3))))
+    || List.mem num (Array.to_list (get_col board (col + 1)))
+    || List.mem num (Array.to_list (get_row board (row + 1))))
+
+(* let fill_pos board row col = let rand_9_lst = [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ]
+   in let i = ref 0 in while board.(row).(col) = 0 || !i < 9 do let _ =
+   print_endline (string_of_int (List.nth rand_9_lst !i) ^ " " ^ string_of_bool
+   (valid_place board row col (List.nth rand_9_lst !i))) in if valid_place board
+   row col (List.nth rand_9_lst !i) then board.(row).(col) <- List.nth
+   rand_9_lst !i else i := !i + 1 done
+
+   let empty_board = [| [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0;
+   0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [|
+   0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0;
+   0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0; 0 |]; [| 0; 0; 0; 0; 0; 0; 0; 0;
+   0 |]; |]
+
+   let has_empty board = Array.exists (fun row -> Array.exists (fun x -> x = 0)
+   row) board *)
+
+(* let rec generate_board_h board result = let num_lst = [ 1; 2; 3; 4; 5; 6; 7;
+   8; 9 ] in for row = 0 to 8 do for col = 0 to 8 do if board.(row).(col) = 0
+   then let shuffled_lst = shuffle num_lst in for i = 0 to 8 do if valid_place
+   board row col (List.nth shuffled_lst i) then board.(row).(col) <- List.nth
+   shuffled_lst i; if not (has_empty board) then let result = true else if
+   generate_board_h board then true else false done done done
+
+   let generate_board () = let b = Array.copy empty_board in let _ =
+   generate_board_h b false in b *)
+
+let generate_board () =
+  let board = generate_random_diagonal () in
+  ();
+  board
