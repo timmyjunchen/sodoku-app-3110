@@ -179,3 +179,32 @@ let solve_board brd =
   with Exit ->
     ();
     brd
+
+let deep_copy_board board =
+  let new_board = Array.init 9 (fun _ -> Array.init 9 (fun _ -> 0)) in
+  for i = 0 to 8 do
+    for j = 0 to 8 do
+      new_board.(i).(j) <- board.(i).(j)
+    done
+  done;
+  new_board
+
+let board_hint board =
+  let solve_temp = deep_copy_board board.current_board in
+  try
+    let solved =
+      solve_board
+        { start_board = board.start_board; current_board = solve_temp }
+    in
+    Random.self_init ();
+    let row = ref (Random.int 9) in
+    let col = ref (Random.int 9) in
+    while board.current_board.(!row).(!col) <> 0 do
+      row := Random.int 9;
+      col := Random.int 9
+    done;
+    board.current_board.(!row).(!col) <- solved.current_board.(!row).(!col);
+    print_endline (string_of_int board.current_board.(!row).(!col));
+    print_board solved;
+    Legal board
+  with Not_found -> Illegal

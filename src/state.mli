@@ -48,3 +48,4 @@ val delete : int -> int -> t -> result
 
 val check_win : t -> bool
 val solve_board : t -> t
+val board_hint : t -> result

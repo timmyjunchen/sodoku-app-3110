@@ -33,6 +33,10 @@ let main () =
         | Illegal ->
             ("\n\nCannot delete values in that cell. Try Again \n", board))
     | Solve -> ("\n\n Here is your solved board", solve_board board)
+    | Hint -> (
+        match board_hint board with
+        | Legal brd -> ("Here's a hint!", brd)
+        | Illegal -> ("The board is unsolvable", board))
     | Quit -> Stdlib.exit 0
   in
   let rec prompt str board =
