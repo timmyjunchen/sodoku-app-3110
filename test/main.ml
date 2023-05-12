@@ -33,16 +33,6 @@ let board2_grid =
 let board1 = init_state board1_grid
 let board2 = init_state board2_grid
 
-(*adventure tests*)
-let start_board_test name adv expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (start_board adv)
-
-let grid_tests =
-  [
-    (*start board test*)
-    start_board_test "board1 start board" board1 board1_grid;
-  ]
-
 let command_tests =
   [
     ( {|parse command place 2 3 5|} >:: fun _ ->
@@ -127,16 +117,65 @@ let state_tests =
       [||];
   ]
 
+let empty_board = Array.make_matrix 9 9 0
+
+let partially_filled_board =
+  [|
+    [| 2; 0; 0; 3; 0; 0; 0; 0; 0 |];
+    [| 8; 1; 4; 0; 6; 2; 0; 0; 3 |];
+    [| 0; 1; 3; 8; 0; 0; 2; 0; 0 |];
+    [| 0; 0; 0; 0; 2; 0; 3; 9; 0 |];
+    [| 5; 0; 7; 0; 0; 0; 6; 2; 1 |];
+    [| 0; 3; 2; 0; 0; 6; 0; 0; 0 |];
+    [| 0; 2; 0; 0; 0; 9; 1; 4; 0 |];
+    [| 6; 0; 1; 2; 5; 0; 8; 0; 9 |];
+    [| 0; 0; 0; 0; 0; 1; 0; 0; 2 |];
+  |]
+
+let filled_board =
+  [|
+    [| 2; 1; 1; 3; 1; 1; 1; 1; 1 |];
+    [| 8; 1; 4; 1; 6; 2; 1; 1; 3 |];
+    [| 1; 1; 3; 8; 1; 1; 2; 1; 1 |];
+    [| 1; 1; 1; 1; 2; 1; 3; 9; 1 |];
+    [| 5; 1; 7; 1; 1; 1; 6; 1; 1 |];
+    [| 1; 3; 2; 1; 1; 6; 1; 1; 1 |];
+    [| 1; 2; 1; 1; 1; 9; 1; 4; 1 |];
+    [| 6; 1; 1; 2; 5; 1; 8; 1; 9 |];
+    [| 1; 1; 1; 1; 1; 1; 1; 1; 2 |];
+  |]
+
+let almost_filled_board =
+  [|
+    [| 2; 1; 1; 3; 1; 1; 1; 1; 1 |];
+    [| 8; 1; 4; 1; 6; 2; 1; 1; 3 |];
+    [| 1; 1; 3; 8; 1; 1; 2; 1; 1 |];
+    [| 1; 1; 1; 1; 2; 1; 3; 9; 1 |];
+    [| 5; 1; 7; 1; 1; 1; 6; 1; 1 |];
+    [| 1; 3; 2; 1; 1; 6; 1; 1; 1 |];
+    [| 1; 2; 1; 1; 1; 9; 1; 4; 1 |];
+    [| 6; 1; 1; 2; 5; 1; 8; 1; 9 |];
+    [| 1; 1; 1; 1; 1; 1; 1; 1; 0 |];
+  |]
+
 let boardmaker_tests =
   [
     ( {|shuffle list|} >:: fun _ ->
       assert (
         shuffle [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] <> [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ])
     );
+    ( {|board_filled empty|} >:: fun _ ->
+      assert_equal (board_filled empty_board) false );
+    ( {|board_filled partial|} >:: fun _ ->
+      assert_equal (board_filled partially_filled_board) false );
+    ( {|board_filled filled|} >:: fun _ ->
+      assert_equal (board_filled filled_board) true );
+    ( {|board_filled almost|} >:: fun _ ->
+      assert_equal (board_filled almost_filled_board) false );
   ]
 
 let suite =
   "test suite for A2"
-  >::: List.flatten [ grid_tests; command_tests; state_tests; boardmaker_tests ]
+  >::: List.flatten [ command_tests; state_tests; boardmaker_tests ]
 
 let _ = run_test_tt_main suite
