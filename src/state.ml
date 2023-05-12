@@ -4,13 +4,18 @@ exception InvalidBox of int * int
 exception InvalidAnswer of int
 
 type t = {
-  start_board : int array array;
+  start_board : int list;
   current_board : int array array;
 }
 
-let init_state board = { start_board = board; current_board = board }
+let flatten_nested arr = Array.(concat (to_list arr))
+
+let init_state board =
+  { start_board = Array.to_list (flatten_nested board); current_board = board }
+
 let start_board st = st.start_board
 let current_board st = st.current_board
+let size st = Array.length st.current_board
 (*let rec _print_array arr = Array.iter (printf "%d ") arr*)
 
 let print_board (st : t) : unit =
@@ -71,6 +76,17 @@ let get_cell (st : t) ((row, col) : int * int) : int =
 let check_input input = 1 <= input && input <= 9
 (* let replace arr row col value = arr.(row - 1).(col - 1) <- value *)
 
+let unchanged (st : t) ((row, col) : int * int) : bool =
+  let start_coords =
+    List.nth (start_board st) ((size st * (row - 1)) + col - 1)
+  in
+  get_cell st (row, col) == start_coords
+
+let replace_value (board : int array array) ((row, col) : int * int)
+    (value : int) : int array array =
+  board.(row - 1).(col - 1) <- value;
+  board
+
 let next_grid st row col value =
   let current_board = current_board st in
   (* let _ = get_cell st (row, col) |> string_of_int |> print_endline in *)
@@ -78,12 +94,18 @@ let next_grid st row col value =
   match get_cell st (row, col) with
   | 0 -> begin
       match check_input value with
-      | true ->
-          (* replace current_board row col value; *)
-          current_board.(row - 1).(col - 1) <- value;
-          current_board
-      | false -> raise (InvalidAnswer value)
-      | exception _ -> raise (InvalidAnswer value)
+      | true -> replace_value current_board (row, col) value
+      | false -> (
+          match value with
+          | 0 -> raise (InvalidBox (row, col))
+          | _ -> raise (InvalidAnswer value)
+          | exception _ -> raise (InvalidAnswer value))
+    end
+  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 -> begin
+      match unchanged st (row, col) with
+      | true -> raise (InvalidBox (row, col))
+      | false -> replace_value current_board (row, col) value
+      | exception _ -> raise (InvalidBox (row, col))
     end
   | exception _ -> raise (InvalidBox (row, col))
   | _ -> raise (InvalidBox (row, col))
@@ -95,14 +117,14 @@ type result =
 let answer row col value st =
   try
     let new_grid = next_grid st row col value in
-    let st' = { start_board = start_board st; current_board = new_grid } in
+    let st' = { st with current_board = new_grid } in
     Legal st'
   with InvalidBox _ | InvalidAnswer _ -> Illegal
 
 let delete row col st =
   try
     let new_grid = next_grid st row col 0 in
-    let st' = { start_board = start_board st; current_board = new_grid } in
+    let st' = { st with current_board = new_grid } in
     Legal st'
   with InvalidBox _ | InvalidAnswer _ -> Illegal
 
