@@ -106,14 +106,15 @@ let valid_place board row col num =
 
 let board_filled board =
   let filled = ref true in
-  let pos = 0 in
-  while pos < 81 && !filled do
-    filled := board.(pos / 9).(pos mod 9) <> 0
+  let pos = ref 0 in
+  while !pos < Array.length board * Array.length board.(0) && !filled do
+    filled := board.(!pos / 9).(!pos mod 9) <> 0;
+    pos := !pos + 1
   done;
   !filled
 
 let generate_board () =
-  let board = generate_random_diagonal () in
+  let board = ref (generate_random_diagonal ()) in
   ();
 
-  board
+  !board
