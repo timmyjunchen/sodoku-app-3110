@@ -104,7 +104,16 @@ let valid_place board row col num =
     || List.mem num (Array.to_list (get_col board (col + 1)))
     || List.mem num (Array.to_list (get_row board (row + 1))))
 
+let board_filled board =
+  let filled = ref true in
+  let pos = 0 in
+  while pos < 81 && !filled do
+    filled := board.(pos / 9).(pos mod 9) <> 0
+  done;
+  !filled
+
 let generate_board () =
   let board = generate_random_diagonal () in
   ();
+
   board
