@@ -15,7 +15,7 @@ val init_state : int array array -> t
     [g] game. In that state the player has not yet filled out any boxes and is
     on the starting grid. *)
 
-val start_board : t -> int list
+val start_board : t -> int array array
 (** [start_board st] is the identifier of the start board state [st]. *)
 
 val current_board : t -> int array array

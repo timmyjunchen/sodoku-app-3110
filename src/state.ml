@@ -4,18 +4,25 @@ exception InvalidBox of int * int
 exception InvalidAnswer of int
 
 type t = {
-  start_board : int list;
+  start_board : int array array;
   current_board : int array array;
 }
 
-let flatten_nested arr = Array.(concat (to_list arr))
+let deep_copy_board board =
+  let new_board = Array.init 9 (fun _ -> Array.init 9 (fun _ -> 0)) in
+  for i = 0 to 8 do
+    for j = 0 to 8 do
+      new_board.(i).(j) <- board.(i).(j)
+    done
+  done;
+  new_board
 
 let init_state board =
-  { start_board = Array.to_list (flatten_nested board); current_board = board }
+  { start_board = deep_copy_board board; current_board = board }
 
 let start_board st = st.start_board
 let current_board st = st.current_board
-let size st = Array.length st.current_board
+
 (*let rec _print_array arr = Array.iter (printf "%d ") arr*)
 
 let print_board (st : t) : unit =
@@ -77,10 +84,7 @@ let check_input input = 1 <= input && input <= 9
 (* let replace arr row col value = arr.(row - 1).(col - 1) <- value *)
 
 let unchanged (st : t) ((row, col) : int * int) : bool =
-  let start_coords =
-    List.nth (start_board st) ((size st * (row - 1)) + col - 1)
-  in
-  get_cell st (row, col) == start_coords
+  get_cell st (row, col) == (start_board st).(row - 1).(col - 1)
 
 let replace_value (board : int array array) ((row, col) : int * int)
     (value : int) : int array array =
@@ -102,10 +106,14 @@ let next_grid st row col value =
           | exception _ -> raise (InvalidAnswer value))
     end
   | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 -> begin
-      match unchanged st (row, col) with
-      | true -> raise (InvalidBox (row, col))
-      | false -> replace_value current_board (row, col) value
-      | exception _ -> raise (InvalidBox (row, col))
+      match value with
+      | 0 -> (
+          match unchanged st (row, col) with
+          | true -> raise (InvalidBox (row, col))
+          | false -> replace_value current_board (row, col) value
+          | exception _ -> raise (InvalidBox (row, col)))
+      | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 -> raise (InvalidBox (row, col))
+      | _ -> raise (InvalidAnswer value)
     end
   | exception _ -> raise (InvalidBox (row, col))
   | _ -> raise (InvalidBox (row, col))
@@ -179,15 +187,6 @@ let solve_board brd =
   with Exit ->
     ();
     brd
-
-let deep_copy_board board =
-  let new_board = Array.init 9 (fun _ -> Array.init 9 (fun _ -> 0)) in
-  for i = 0 to 8 do
-    for j = 0 to 8 do
-      new_board.(i).(j) <- board.(i).(j)
-    done
-  done;
-  new_board
 
 let board_hint board =
   let solve_temp = deep_copy_board board.current_board in

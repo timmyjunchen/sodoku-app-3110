@@ -27,17 +27,22 @@ let parse (str : string) : command =
   in
   match filtered with
   | [] -> raise Empty
-  | "place" :: t ->
+  | "place" :: t -> (
       let vals = list_to_string t in
-      Move
-        {
-          row = List.nth vals 0;
-          col = List.nth vals 1;
-          value = List.nth vals 2;
-        }
-  | "delete" :: t ->
+      match List.length vals with
+      | 3 ->
+          Move
+            {
+              row = List.nth vals 0;
+              col = List.nth vals 1;
+              value = List.nth vals 2;
+            }
+      | _ -> raise Malformed)
+  | "delete" :: t -> (
       let vals = list_to_string t in
-      Delete { row = List.nth vals 0; col = List.nth vals 1 }
+      match List.length vals with
+      | 2 -> Delete { row = List.nth vals 0; col = List.nth vals 1 }
+      | _ -> raise Malformed)
   | [ "solve" ] -> Solve
   | [ "hint" ] -> Hint
   | [ "quit" ] -> Quit
