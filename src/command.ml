@@ -12,6 +12,8 @@ type move_phrase = {
 type command =
   | Move of move_phrase
   | Delete of coordinates
+  | Solve
+  | Hint
   | Quit
 
 exception Empty
@@ -36,5 +38,7 @@ let parse (str : string) : command =
   | "delete" :: t ->
       let vals = list_to_string t in
       Delete { row = List.nth vals 0; col = List.nth vals 1 }
+  | [ "solve" ] -> Solve
+  | [ "hint" ] -> Hint
   | [ "quit" ] -> Quit
   | _ -> raise Malformed
