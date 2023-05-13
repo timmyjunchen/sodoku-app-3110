@@ -22,14 +22,21 @@ let command_tests =
       (Move { row = 2; col = 3; value = 5 });
     parse_test "parse command place 2  3 5" "place 2  3 5"
       (Move { row = 2; col = 3; value = 5 });
+    parse_test "parse command Place 2  3 5" "Place 2  3 5"
+      (Move { row = 2; col = 3; value = 5 });
+    parse_test "parse command pLaCe 2  3 5" "pLaCe 2  3 5"
+      (Move { row = 2; col = 3; value = 5 });
     (*place error tests*)
     parse_error_test "malformed place" "place" Malformed;
     parse_error_test "malformed place 2 input" "place 3 2" Malformed;
+    parse_error_test "malformed Place 2 input" "Place 3 2" Malformed;
     parse_error_test "malformed place >3 input" "place 3 2 5 6" Malformed;
     (*delete tests*)
     parse_test "parse command delete 6 7" "delete 6 7"
       (Delete { row = 6; col = 7 });
     parse_test "parse command delete 6   7" "delete 6   7"
+      (Delete { row = 6; col = 7 });
+    parse_test "parse command Delete 6 7" "Delete 6 7"
       (Delete { row = 6; col = 7 });
     (*delete error tests*)
     parse_error_test "malformed delete" "delete" Malformed;
@@ -38,16 +45,19 @@ let command_tests =
     (*Solve tests*)
     parse_test "solve" "solve" Solve;
     parse_test " solve  " " solve  " Solve;
+    parse_test "Solve" "Solve" Solve;
     (*Solve error tests *)
     parse_error_test "malformed solve" "solve 1" Malformed;
     (*Hint tests*)
     parse_test "hint" "hint" Hint;
     parse_test "hint  " "hint  " Hint;
+    parse_test "hInt" "hInt" Hint;
     (*Hint error tests *)
     parse_error_test "malformed hint" "hint 1" Malformed;
     (*Quit tests*)
     parse_test "quit" "quit" Quit;
     parse_test " quit  " " quit  " Quit;
+    parse_test " QUIT  " " QUIT  " Quit;
     (*Quit error tests *)
     parse_error_test "malformed quit" "quit 1" Malformed;
   ]
@@ -168,6 +178,11 @@ let state_tests =
     (*start board tests*)
     start_board_test "board 1 start" board1 board1_grid;
     start_board_test "board 221 start" board221 board1_grid_2_2_1;
+    start_board_test "board_incomplete start after answer"
+      board_incomplete_to_complete almost_completed_grid;
+    start_board_test "board_invalid_win start after answer" board_invalid_win
+      almost_completed_grid;
+    start_board_test "board_1 start after hint" board1_hint board1_grid;
     (*current board tests*)
     current_board_test "board 1 current" board1 board1_grid;
     current_board_test "board 221 current" board221 board1_grid_2_2_1;

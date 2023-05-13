@@ -22,6 +22,7 @@ exception Malformed
 let list_to_string lst = List.map (fun x -> int_of_string x) lst
 
 let parse (str : string) : command =
+  let str = String.lowercase_ascii str in
   let filtered =
     List.filter (fun str -> str <> "") (String.split_on_char ' ' str)
   in
