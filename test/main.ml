@@ -95,6 +95,10 @@ let completed_invalid_grid =
 let board1_4x4grid =
   Yojson.Basic.from_file (data_dir_prefix ^ "board1_4x4grid.json") |> from_json
 
+let board423_4x4grid =
+  Yojson.Basic.from_file (data_dir_prefix ^ "board423_4x4grid.json")
+  |> from_json
+
 let start_board_test name (state : State.t) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (start_board state)
 
@@ -280,12 +284,6 @@ let state_tests9x9 =
     solve_board_test "board1 check hint" board1_hint true;
   ]
 
-let state_tests4x4 =
-  let board1 = init_state board1_4x4grid in
-  [
-    (*start board tests*) start_board_test "board 1 start" board1 board1_4x4grid;
-  ]
-
 let delete_board_test name f (row : int) (col : int) (state : State.t)
     expected_output : test =
   let copied_state = deep_copy_state state in
@@ -330,6 +328,42 @@ let delete_tests9x9 =
       board1 [||];
     delete_board_test "start board221 delete in row 8 col 8" start_board 8 8
       board221 [||];
+  ]
+
+let state_tests4x4 =
+  let board1 = init_state board1_4x4grid in
+  let board423 = init_state board423_4x4grid in
+  [
+    (*start board tests*)
+    start_board_test "board 1 start" board1 board1_4x4grid;
+    start_board_test "board 423 start" board423 board423_4x4grid;
+    (*current board tests*)
+    current_board_test "board 1 current" board1 board1_4x4grid;
+    current_board_test "board 423 current" board423 board423_4x4grid;
+    (*row test*)
+    get_rc_test "board 1 get row 1" get_row board1 1 [| 1; 4; 0; 0 |];
+    get_rc_test "board 1 get row 3" get_row board1 3 [| 4; 0; 0; 3 |];
+    get_rc_test "board 423 get row 4" get_row board423 4 [| 0; 3; 4; 1 |];
+    (*col test*)
+    get_rc_test "board 1 get col 1" get_col board1 1 [| 1; 0; 4; 0 |];
+    get_rc_test "board 1 get col 3" get_col board1 3 [| 0; 1; 0; 4 |];
+    get_rc_test "board 423 get col 2" get_col board423 2 [| 4; 2; 0; 3 |];
+    (*block test*)
+    get_bc_test "board 1 get block 1 1" get_block board1 (1, 1) [| 1; 4; 0; 2 |];
+    get_bc_test "board 1 get block 2 2" get_block board1 (2, 2) [| 0; 3; 4; 1 |];
+    get_bc_test "board 423 get block 2 1" get_block board423 (2, 1)
+      [| 4; 0; 0; 3 |];
+    (*cell test*)
+    get_bc_test "board 1 get cell 1 1" get_cell board1 (1, 1) 1;
+    get_bc_test "board 1 get cell 3 4" get_cell board1 (3, 4) 3;
+    get_bc_test "board 423 get cell 4 2" get_cell board423 (4, 2) 3;
+    (*next grid test*)
+    next_grid_test "put 3 in row 4 col 2" board1 4 2 3 board423_4x4grid;
+    (*next grid error test*)
+    next_grid_error_test "invalid row" board1 5 2 1 (InvalidBox (5, 2));
+    next_grid_error_test "invalid col" board1 2 5 1 (InvalidBox (2, 5));
+    next_grid_error_test "cell is filled" board1 1 1 1 (InvalidBox (1, 1));
+    next_grid_error_test "invalid answer" board1 2 2 10 (InvalidAnswer 10);
   ]
 
 let boardmaker_tests = []
