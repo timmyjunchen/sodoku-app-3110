@@ -55,8 +55,7 @@ let print_board (st : t) : unit =
     Array.mapi
       (fun i row ->
         string_of_row row
-        ^ (if (i + 1) mod block_size = 0 && i <> board_size - 1 then
-           "\n---------+---------+--------"
+        ^ (if (i + 1) mod block_size = 0 && i <> board_size - 1 then "\n"
           else "")
         ^ "\n")
       (current_board st)
