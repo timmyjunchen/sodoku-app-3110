@@ -3,6 +3,7 @@ open Sudoku
 open Grid
 open Command
 open State
+open Boardmaker
 
 (*****************************************************************)
 (* Command Tests *)
@@ -516,9 +517,6 @@ let boardmaker_tests =
           [ 2; 3; 4; 8 ];
           [ 1; 4; 8; 9 ];
         |] );
-    (* ( {|get_block_options test|} >:: fun _ -> assert_equal (generate_block
-       test_board 2 1) (Some [| 3; 3; 4; 1; 2; 1; 1; 2; 1 |]) ); *)
-    ({|generate_board|} >:: fun _ -> assert_equal (generate_board ()) [| [||] |]);
   ]
 
 let suite =
