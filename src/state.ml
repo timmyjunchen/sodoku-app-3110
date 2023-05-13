@@ -4,28 +4,49 @@ exception InvalidBox of int * int
 exception InvalidAnswer of int
 
 type t = {
-  start_board : int list;
+  start_board : int array array;
   current_board : int array array;
 }
 
-let flatten_nested arr = Array.(concat (to_list arr))
+exception UnsolvableBoard
+
+let deep_copy_board board =
+  let size = Array.length board in
+  let new_board = Array.init size (fun _ -> Array.init size (fun _ -> 0)) in
+  for i = 0 to size - 1 do
+    for j = 0 to size - 1 do
+      new_board.(i).(j) <- board.(i).(j)
+    done
+  done;
+  new_board
+
+let deep_copy_state st =
+  {
+    start_board = deep_copy_board st.start_board;
+    current_board = deep_copy_board st.current_board;
+  }
 
 let init_state board =
-  { start_board = Array.to_list (flatten_nested board); current_board = board }
+  { start_board = deep_copy_board board; current_board = board }
 
 let start_board st = st.start_board
 let current_board st = st.current_board
-let size st = Array.length st.current_board
-(*let rec _print_array arr = Array.iter (printf "%d ") arr*)
+let board_size st = Array.length (start_board st)
+let block_size st = int_of_float (sqrt (float_of_int (board_size st)))
 
 let print_board (st : t) : unit =
+  let board_size = board_size st in
+  let block_size = block_size st in
   let _ = print_endline "" in
   let string_of_row (row : int array) : string =
     let temp =
       Array.mapi
         (fun i cell ->
           (if cell <> 0 then string_of_int cell else ".")
-          ^ if (i + 1) mod 3 = 0 && i <> 0 && i <> 8 then " | " else "  ")
+          ^
+          if (i + 1) mod block_size = 0 && i <> 0 && i <> board_size - 1 then
+            " | "
+          else "  ")
         row
     in
     Array.fold_left ( ^ ) " " temp
@@ -34,7 +55,7 @@ let print_board (st : t) : unit =
     Array.mapi
       (fun i row ->
         string_of_row row
-        ^ (if (i + 1) mod 3 = 0 && i <> 8 then "\n---------+---------+--------"
+        ^ (if (i + 1) mod block_size = 0 && i <> board_size - 1 then "\n"
           else "")
         ^ "\n")
       (current_board st)
@@ -73,14 +94,10 @@ let get_cell (st : t) ((row, col) : int * int) : int =
      print_endline (string_of_int (current_board st).(1).(1)) in *)
   (current_board st).(row - 1).(col - 1)
 
-let check_input input = 1 <= input && input <= 9
-(* let replace arr row col value = arr.(row - 1).(col - 1) <- value *)
+let check_input input state = 1 <= input && input <= board_size state
 
 let unchanged (st : t) ((row, col) : int * int) : bool =
-  let start_coords =
-    List.nth (start_board st) ((size st * (row - 1)) + col - 1)
-  in
-  get_cell st (row, col) == start_coords
+  get_cell st (row, col) == (start_board st).(row - 1).(col - 1)
 
 let replace_value (board : int array array) ((row, col) : int * int)
     (value : int) : int array array =
@@ -89,11 +106,10 @@ let replace_value (board : int array array) ((row, col) : int * int)
 
 let next_grid st row col value =
   let current_board = current_board st in
-  (* let _ = get_cell st (row, col) |> string_of_int |> print_endline in *)
   let _ = print_board st in
   match get_cell st (row, col) with
   | 0 -> begin
-      match check_input value with
+      match check_input value st with
       | true -> replace_value current_board (row, col) value
       | false -> (
           match value with
@@ -101,11 +117,15 @@ let next_grid st row col value =
           | _ -> raise (InvalidAnswer value)
           | exception _ -> raise (InvalidAnswer value))
     end
-  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 -> begin
-      match unchanged st (row, col) with
-      | true -> raise (InvalidBox (row, col))
-      | false -> replace_value current_board (row, col) value
-      | exception _ -> raise (InvalidBox (row, col))
+  | cell when check_input cell st -> begin
+      match value with
+      | 0 -> (
+          match unchanged st (row, col) with
+          | true -> raise (InvalidBox (row, col))
+          | false -> replace_value current_board (row, col) value
+          | exception _ -> raise (InvalidBox (row, col)))
+      | v when check_input v st -> raise (InvalidBox (row, col))
+      | _ -> raise (InvalidAnswer value)
     end
   | exception _ -> raise (InvalidBox (row, col))
   | _ -> raise (InvalidBox (row, col))
@@ -131,24 +151,26 @@ let delete row col st =
 module SS = Set.Make (Int)
 
 let check_valid board row col =
+  let board_size = Array.length board in
   let arr = board in
   let row_set = ref SS.empty in
   let col_set = ref SS.empty in
   let flag = ref true in
-  for i = 0 to 8 do
+  for i = 0 to board_size - 1 do
     if arr.(row).(i) <> 0 && SS.mem arr.(row).(i) !row_set then flag := false
     else row_set := SS.add arr.(row).(i) !row_set
   done;
-  for i = 0 to 8 do
+  for i = 0 to board_size - 1 do
     if arr.(i).(col) <> 0 && SS.mem arr.(i).(col) !col_set then flag := false
     else col_set := SS.add arr.(i).(col) !col_set
   done;
   !flag
 
 let check_win board =
+  let board_size = board_size board in
   let win = ref true in
-  for i = 0 to 8 do
-    for j = 0 to 8 do
+  for i = 0 to board_size - 1 do
+    for j = 0 to board_size - 1 do
       if
         board.current_board.(i).(j) == 0
         || not (check_valid board.current_board i j)
@@ -158,38 +180,31 @@ let check_win board =
   !win
 
 let solve_board brd =
+  let board_size = board_size brd in
   let board_curr = brd.current_board in
   let rec helper row col board =
-    if row == 8 && col == 8 then raise Exit
+    if row == board_size - 1 && col == board_size - 1 then raise Exit
     else if board.(row).(col) == 0 then (
-      for i = 1 to 9 do
+      for i = 1 to board_size do
         board.(row).(col) <- i;
         if check_valid board row col then
-          if col == 8 then helper (row + 1) 0 board
+          if col == board_size - 1 then helper (row + 1) 0 board
           else helper row (col + 1) board
         else ()
       done;
       board.(row).(col) <- 0)
-    else if col == 8 then helper (row + 1) 0 board
+    else if col == board_size - 1 then helper (row + 1) 0 board
     else helper row (col + 1) board
   in
   try
     helper 0 0 board_curr;
-    raise Not_found
+    raise UnsolvableBoard
   with Exit ->
     ();
     brd
 
-let deep_copy_board board =
-  let new_board = Array.init 9 (fun _ -> Array.init 9 (fun _ -> 0)) in
-  for i = 0 to 8 do
-    for j = 0 to 8 do
-      new_board.(i).(j) <- board.(i).(j)
-    done
-  done;
-  new_board
-
 let board_hint board =
+  let board_size = board_size board in
   let solve_temp = deep_copy_board board.current_board in
   try
     let solved =
@@ -197,14 +212,14 @@ let board_hint board =
         { start_board = board.start_board; current_board = solve_temp }
     in
     Random.self_init ();
-    let row = ref (Random.int 9) in
-    let col = ref (Random.int 9) in
+    let row = ref (Random.int board_size) in
+    let col = ref (Random.int board_size) in
     while board.current_board.(!row).(!col) <> 0 do
-      row := Random.int 9;
-      col := Random.int 9
+      row := Random.int board_size;
+      col := Random.int board_size
     done;
     board.current_board.(!row).(!col) <- solved.current_board.(!row).(!col);
     print_endline (string_of_int board.current_board.(!row).(!col));
     print_board solved;
     Legal board
-  with Not_found -> Illegal
+  with UnsolvableBoard -> Illegal

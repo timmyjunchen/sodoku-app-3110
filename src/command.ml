@@ -22,22 +22,28 @@ exception Malformed
 let list_to_string lst = List.map (fun x -> int_of_string x) lst
 
 let parse (str : string) : command =
+  let str = String.lowercase_ascii str in
   let filtered =
     List.filter (fun str -> str <> "") (String.split_on_char ' ' str)
   in
   match filtered with
   | [] -> raise Empty
-  | "place" :: t ->
+  | "place" :: t -> (
       let vals = list_to_string t in
-      Move
-        {
-          row = List.nth vals 0;
-          col = List.nth vals 1;
-          value = List.nth vals 2;
-        }
-  | "delete" :: t ->
+      match List.length vals with
+      | 3 ->
+          Move
+            {
+              row = List.nth vals 0;
+              col = List.nth vals 1;
+              value = List.nth vals 2;
+            }
+      | _ -> raise Malformed)
+  | "delete" :: t -> (
       let vals = list_to_string t in
-      Delete { row = List.nth vals 0; col = List.nth vals 1 }
+      match List.length vals with
+      | 2 -> Delete { row = List.nth vals 0; col = List.nth vals 1 }
+      | _ -> raise Malformed)
   | [ "solve" ] -> Solve
   | [ "hint" ] -> Hint
   | [ "quit" ] -> Quit
