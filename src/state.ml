@@ -8,7 +8,7 @@ type t = {
   current_board : int array array;
 }
 
-exception UnsolvableBoard of t
+exception UnsolvableBoard
 
 let deep_copy_board board =
   let new_board = Array.init 9 (fun _ -> Array.init 9 (fun _ -> 0)) in
@@ -191,7 +191,7 @@ let solve_board brd =
   in
   try
     helper 0 0 board_curr;
-    raise (UnsolvableBoard brd)
+    raise UnsolvableBoard
   with Exit ->
     ();
     brd
@@ -214,4 +214,4 @@ let board_hint board =
     print_endline (string_of_int board.current_board.(!row).(!col));
     print_board solved;
     Legal board
-  with Not_found -> Illegal
+  with UnsolvableBoard -> Illegal

@@ -36,14 +36,17 @@ let command_tests =
     parse_error_test "malformed delete >2 input" "delete 8 9 1" Malformed;
     (*Solve tests*)
     parse_test "solve" "solve" Solve;
+    parse_test " solve  " " solve  " Solve;
     (*Solve error tests *)
     parse_error_test "malformed solve" "solve 1" Malformed;
     (*Hint tests*)
     parse_test "hint" "hint" Hint;
+    parse_test "hint  " "hint  " Hint;
     (*Hint error tests *)
     parse_error_test "malformed hint" "hint 1" Malformed;
     (*Quit tests*)
     parse_test "quit" "quit" Quit;
+    parse_test " quit  " " quit  " Quit;
     (*Quit error tests *)
     parse_error_test "malformed quit" "quit 1" Malformed;
   ]
@@ -169,25 +172,38 @@ let check_win_test name (state : State.t) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (check_win state)
 
 let solve_board_test name (state : State.t) expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (check_win (solve_board state))
+  let copied_state = deep_copy_state state in
+  name >:: fun _ ->
+  assert_equal expected_output (check_win (solve_board copied_state))
 
 let solve_board_error_test name (state : State.t) expected_error : test =
-  name >:: fun _ -> assert_raises expected_error (fun () -> solve_board state)
+  let copied_state = deep_copy_state state in
+  name >:: fun _ ->
+  assert_raises expected_error (fun () -> solve_board copied_state)
 
 let extract_state (f : string) (row : int) (col : int) (value : int)
     (state : State.t) =
+  let copied_state = deep_copy_state state in
   match f with
   | "answer" -> (
-      match answer row col value (deep_copy_state state) with
+      match answer row col value copied_state with
       | Legal new_state -> new_state
       | Illegal ->
-          failwith "can't happen" (*answer will always be legal in our tests*))
+          failwith "can't happen"
+          (*answer will always be legal when using this helper *))
   | "delete" -> (
-      match delete row col (deep_copy_state state) with
+      match delete row col copied_state with
       | Legal new_state -> new_state
       | Illegal ->
-          failwith "can't happen" (*delete will always be legal in our tests*))
-  | _ -> failwith "can't happen" (*f will always be one of answer or delete*)
+          failwith "can't happen"
+          (*delete will always be legal when using this helper*))
+  | "hint" -> (
+      match board_hint copied_state with
+      | Legal new_state -> new_state
+      | Illegal ->
+          failwith "can't happen"
+          (*hint will always be legal when using this helper*))
+  | _ -> failwith "can't happen" (*f will always be one of above strings*)
 
 let state_tests =
   let board1 = init_state board1_grid in
@@ -196,11 +212,11 @@ let state_tests =
   let board_complete_invalid = init_state completed_invalid_grid in
   let board_incomplete = init_state almost_completed_grid in
   let board_incomplete_to_complete =
-    extract_state "answer" 1 1 5 (deep_copy_state board_incomplete)
+    extract_state "answer" 1 1 5 board_incomplete
   in
-  let board_invalid_win =
-    extract_state "answer" 1 1 8 (deep_copy_state board_incomplete)
-  in
+  let board_invalid_win = extract_state "answer" 1 1 8 board_incomplete in
+  let board1_hint = extract_state "hint" 0 0 0 board1 in
+
   [
     (*start board tests*)
     start_board_test "board 1 start" board1 board1_grid;
@@ -273,16 +289,18 @@ let state_tests =
     check_win_test "board1 check win" board1 false;
     (*solve tests*)
     solve_board_test "board1 check solve" board1 true;
-    solve_board_test "board_incomplete check solve" board_incomplete true
-    (*solve error tests*);
+    solve_board_test "board_incomplete check solve" board_incomplete true;
+    (*solve error tests*)
     solve_board_error_test "board221 check not solvable" board221
-      (UnsolvableBoard board221);
+      UnsolvableBoard;
+    (*hint tests*)
+    solve_board_test "board1 check hint" board1_hint true;
   ]
 
 let delete_board_test name f (row : int) (col : int) (state : State.t)
     expected_output : test =
+  let copied_state = deep_copy_state state in
   let new_board =
-    let copied_state = deep_copy_state state in
     match delete row col copied_state with
     | Legal new_state -> f new_state
     | Illegal -> [||] (*sudoku boards cant be empty*)
@@ -291,8 +309,8 @@ let delete_board_test name f (row : int) (col : int) (state : State.t)
 
 let delete_tests =
   let board1 = init_state board1_grid in
-  let board221 = extract_state "answer" 2 2 1 (deep_copy_state board1) in
-  let board493 = extract_state "answer" 4 9 3 (deep_copy_state board221) in
+  let board221 = extract_state "answer" 2 2 1 board1 in
+  let board493 = extract_state "answer" 4 9 3 board221 in
 
   [
     (*current grid delete legal test*)

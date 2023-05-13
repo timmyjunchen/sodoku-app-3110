@@ -10,7 +10,7 @@ exception InvalidAnswer of int
 type t
 (** The abstract type of values representing the game state. *)
 
-exception UnsolvableBoard of t
+exception UnsolvableBoard
 
 val init_state : int array array -> t
 (** [init_state g] is the initial state of the game when playing the sudoku grid
