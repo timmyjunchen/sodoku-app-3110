@@ -66,6 +66,7 @@ let command_tests =
 (* State Tests *)
 (*****************************************************************)
 
+(* 9 x 9 grids*)
 let data_dir_prefix = "grids" ^ Filename.dir_sep
 
 let board1_grid =
@@ -90,14 +91,18 @@ let completed_invalid_grid =
   Yojson.Basic.from_file (data_dir_prefix ^ "completed_invalid_grid.json")
   |> from_json
 
+(* 2 x 2 grids*)
+let board1_4x4grid =
+  Yojson.Basic.from_file (data_dir_prefix ^ "board1_4x4grid.json") |> from_json
+
 let start_board_test name (state : State.t) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (start_board state)
 
 let current_board_test name (state : State.t) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (current_board state)
 
-let get_rc_test name f (state : State.t) (row : int) expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (f state row)
+let get_rc_test name f (state : State.t) (rc : int) expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (f state rc)
 
 let get_bc_test name f (state : State.t) ((row, col) : int * int)
     expected_output : test =
@@ -162,9 +167,11 @@ let extract_state (f : string) (row : int) (col : int) (value : int)
           (*hint will always be legal when using this helper*))
   | _ -> failwith "can't happen" (*f will always be one of above strings*)
 
-let state_tests =
+let state_tests9x9 =
   let board1 = init_state board1_grid in
   let board221 = init_state board1_grid_2_2_1 in
+  let board493 = extract_state "answer" 4 9 3 board221 in
+  let board221_delete = extract_state "delete" 4 9 0 board493 in
   let board_complete = init_state completed_grid in
   let board_complete_invalid = init_state completed_invalid_grid in
   let board_incomplete = init_state almost_completed_grid in
@@ -189,17 +196,31 @@ let state_tests =
     (*row test*)
     get_rc_test "row 1 board1" get_row board1 1 [| 2; 0; 0; 3; 0; 0; 0; 0; 0 |];
     get_rc_test "row 7 board1" get_row board1 7 [| 0; 2; 0; 0; 0; 9; 1; 4; 0 |];
+    get_rc_test "row 4 board493 after answer" get_row board493 4
+      [| 0; 0; 0; 0; 2; 0; 3; 9; 3 |];
+    get_rc_test "row 4 board221 after delete" get_row board221_delete 4
+      [| 0; 0; 0; 0; 2; 0; 3; 9; 0 |];
     (*col test*)
     get_rc_test "col 1 board1" get_col board1 1 [| 2; 8; 0; 0; 5; 0; 0; 6; 0 |];
-    get_rc_test "row 7 board1" get_col board1 8 [| 0; 0; 0; 9; 2; 0; 4; 0; 0 |];
+    get_rc_test "col 7 board1" get_col board1 8 [| 0; 0; 0; 9; 2; 0; 4; 0; 0 |];
+    get_rc_test "col 9 board493 after answer" get_col board493 9
+      [| 0; 3; 0; 3; 1; 0; 0; 9; 2 |];
+    get_rc_test "col 9 board221 after delete" get_col board221_delete 9
+      [| 0; 3; 0; 0; 1; 0; 0; 9; 2 |];
     (*block test*)
     get_bc_test "block 1 1 board1" get_block board1 (1, 1)
       [| 2; 0; 0; 8; 0; 4; 0; 1; 3 |];
     get_bc_test "block 3 2 board1" get_block board1 (3, 2)
       [| 0; 0; 9; 2; 5; 0; 0; 0; 1 |];
+    get_bc_test "block 2 3 board493 after answer" get_block board493 (2, 3)
+      [| 3; 9; 3; 6; 2; 1; 0; 0; 0 |];
+    get_bc_test "block 2 3 board221 after delete" get_block board221_delete
+      (2, 3)
+      [| 3; 9; 0; 6; 2; 1; 0; 0; 0 |];
     (*cell test*)
     get_bc_test "cell 1 1 board1" get_cell board1 (1, 1) 2;
     get_bc_test "cell 3 8 board1" get_cell board1 (3, 8) 0;
+    get_bc_test "cell 4 9 board493 after answer" get_cell board493 (4, 9) 3;
     (*next grid test*)
     next_grid_test "put 1 in row 2 col 2" board1 2 2 1 board1_grid_2_2_1;
     next_grid_test "put 3 in row 4 col 9" board221 4 9 3 board221_grid_4_9_3;
@@ -259,6 +280,12 @@ let state_tests =
     solve_board_test "board1 check hint" board1_hint true;
   ]
 
+let state_tests4x4 =
+  let board1 = init_state board1_4x4grid in
+  [
+    (*start board tests*) start_board_test "board 1 start" board1 board1_4x4grid;
+  ]
+
 let delete_board_test name f (row : int) (col : int) (state : State.t)
     expected_output : test =
   let copied_state = deep_copy_state state in
@@ -269,7 +296,7 @@ let delete_board_test name f (row : int) (col : int) (state : State.t)
   in
   name >:: fun _ -> assert_equal expected_output new_board
 
-let delete_tests =
+let delete_tests9x9 =
   let board1 = init_state board1_grid in
   let board221 = extract_state "answer" 2 2 1 board1 in
   let board493 = extract_state "answer" 4 9 3 board221 in
@@ -310,6 +337,12 @@ let boardmaker_tests = []
 let suite =
   "test suite for A2"
   >::: List.flatten
-         [ command_tests; state_tests; delete_tests; boardmaker_tests ]
+         [
+           command_tests;
+           state_tests9x9;
+           state_tests4x4;
+           delete_tests9x9;
+           boardmaker_tests;
+         ]
 
 let _ = run_test_tt_main suite
