@@ -158,6 +158,19 @@ let almost_filled_board =
     [| 1; 1; 1; 1; 1; 1; 1; 1; 0 |];
   |]
 
+let test_board =
+  [|
+    [| 8; 9; 2; 0; 0; 0; 0; 0; 0 |];
+    [| 4; 1; 6; 0; 0; 0; 0; 0; 0 |];
+    [| 5; 7; 3; 0; 0; 0; 0; 0; 0 |];
+    [| 0; 0; 0; 1; 2; 8; 0; 0; 0 |];
+    [| 0; 0; 0; 9; 4; 3; 0; 0; 0 |];
+    [| 0; 0; 0; 7; 6; 5; 0; 0; 0 |];
+    [| 0; 0; 0; 0; 0; 0; 9; 1; 5 |];
+    [| 0; 0; 0; 0; 0; 0; 7; 2; 6 |];
+    [| 0; 0; 0; 0; 0; 0; 8; 4; 3 |];
+  |]
+
 let boardmaker_tests =
   [
     ( {|shuffle list|} >:: fun _ ->
@@ -172,6 +185,27 @@ let boardmaker_tests =
       assert_equal (board_filled filled_board) true );
     ( {|board_filled almost|} >:: fun _ ->
       assert_equal (board_filled almost_filled_board) false );
+    ( {|get_options test|} >:: fun _ ->
+      assert_equal (get_options test_board 4 1) [ 3; 6; 7; 9 ] );
+    ( {|get_options test 2|} >:: fun _ ->
+      assert_equal (get_options test_board 4 3) [ 4; 5; 7; 9 ] );
+    ( {|get_block_options test|} >:: fun _ ->
+      assert_equal
+        (get_block_options test_board 2 1)
+        [|
+          [ 3; 6; 7; 9 ];
+          [ 3; 4; 5; 6 ];
+          [ 4; 5; 7; 9 ];
+          [ 1; 2; 6; 7 ];
+          [ 2; 5; 6; 8 ];
+          [ 1; 5; 7; 8 ];
+          [ 1; 2; 3; 9 ];
+          [ 2; 3; 4; 8 ];
+          [ 1; 4; 8; 9 ];
+        |] );
+    (* ( {|get_block_options test|} >:: fun _ -> assert_equal (generate_block
+       test_board 2 1) (Some [| 3; 3; 4; 1; 2; 1; 1; 2; 1 |]) ); *)
+    ({|generate_board|} >:: fun _ -> assert_equal (generate_board ()) [||]);
   ]
 
 let suite =
