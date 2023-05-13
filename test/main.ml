@@ -99,6 +99,18 @@ let board423_4x4grid =
   Yojson.Basic.from_file (data_dir_prefix ^ "board423_4x4grid.json")
   |> from_json
 
+let completed_4x4grid =
+  Yojson.Basic.from_file (data_dir_prefix ^ "completed_4x4grid.json")
+  |> from_json
+
+let completed_invalid_4x4grid =
+  Yojson.Basic.from_file (data_dir_prefix ^ "completed_invalid_4x4grid.json")
+  |> from_json
+
+let board321_4x4grid =
+  Yojson.Basic.from_file (data_dir_prefix ^ "board321_4x4grid.json")
+  |> from_json
+
 let start_board_test name (state : State.t) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (start_board state)
 
@@ -333,10 +345,14 @@ let delete_tests9x9 =
 let state_tests4x4 =
   let board1 = init_state board1_4x4grid in
   let board423 = init_state board423_4x4grid in
+  let board321 = extract_state "answer" 3 2 1 board423 in
+  let board_complete = init_state completed_4x4grid in
+  let board_invalid = init_state completed_invalid_4x4grid in
   [
     (*start board tests*)
     start_board_test "board 1 start" board1 board1_4x4grid;
     start_board_test "board 423 start" board423 board423_4x4grid;
+    start_board_test "board 321 start after answer" board321 board423_4x4grid;
     (*current board tests*)
     current_board_test "board 1 current" board1 board1_4x4grid;
     current_board_test "board 423 current" board423 board423_4x4grid;
@@ -344,26 +360,74 @@ let state_tests4x4 =
     get_rc_test "board 1 get row 1" get_row board1 1 [| 1; 4; 0; 0 |];
     get_rc_test "board 1 get row 3" get_row board1 3 [| 4; 0; 0; 3 |];
     get_rc_test "board 423 get row 4" get_row board423 4 [| 0; 3; 4; 1 |];
+    get_rc_test "board 321 get row 3 after answer" get_row board321 3
+      [| 4; 1; 0; 3 |];
     (*col test*)
     get_rc_test "board 1 get col 1" get_col board1 1 [| 1; 0; 4; 0 |];
     get_rc_test "board 1 get col 3" get_col board1 3 [| 0; 1; 0; 4 |];
     get_rc_test "board 423 get col 2" get_col board423 2 [| 4; 2; 0; 3 |];
+    get_rc_test "board 321 get col 2 after answer" get_col board321 2
+      [| 4; 2; 1; 3 |];
     (*block test*)
     get_bc_test "board 1 get block 1 1" get_block board1 (1, 1) [| 1; 4; 0; 2 |];
     get_bc_test "board 1 get block 2 2" get_block board1 (2, 2) [| 0; 3; 4; 1 |];
     get_bc_test "board 423 get block 2 1" get_block board423 (2, 1)
       [| 4; 0; 0; 3 |];
+    get_bc_test "board 321 get block 2 1 after answer" get_block board321 (2, 1)
+      [| 4; 1; 0; 3 |];
     (*cell test*)
     get_bc_test "board 1 get cell 1 1" get_cell board1 (1, 1) 1;
     get_bc_test "board 1 get cell 3 4" get_cell board1 (3, 4) 3;
     get_bc_test "board 423 get cell 4 2" get_cell board423 (4, 2) 3;
+    get_bc_test "board 321 get block 3 2 after answer" get_cell board321 (3, 2)
+1;
     (*next grid test*)
     next_grid_test "put 3 in row 4 col 2" board1 4 2 3 board423_4x4grid;
+    next_grid_test "put 1 in row 3 col 2" board423 3 2 1 board321_4x4grid;
     (*next grid error test*)
     next_grid_error_test "invalid row" board1 5 2 1 (InvalidBox (5, 2));
     next_grid_error_test "invalid col" board1 2 5 1 (InvalidBox (2, 5));
     next_grid_error_test "cell is filled" board1 1 1 1 (InvalidBox (1, 1));
     next_grid_error_test "invalid answer" board1 2 2 10 (InvalidAnswer 10);
+    (*current grid answer legal test*)
+    answer_board_test "current board1 answer 3 in row 4 col 2" current_board 4 2
+      3 board1 board423_4x4grid;
+    answer_board_test "current board423 answer 1 in row 3 col 2" current_board 3
+      2 1 board423 board321_4x4grid;
+    (*current grid answer illegal test*)
+    answer_board_test "current board1 answer 1 in row 5 col 2" current_board 5 2
+      1 board1 [||];
+    answer_board_test "current board1 answer 1 in row 2 col 6" current_board 2 6
+      1 board1 [||];
+    answer_board_test "current board1 answer 10 in row 2 col 2" current_board 2
+      2 10 board1 [||];
+    answer_board_test "current board1 answer 1 in row 1 col 1" current_board 1 1
+      1 board1 [||];
+    answer_board_test "current board423 answer 9 in row 4 col 2" current_board 4
+      2 9 board423 [||];
+    (*start grid answer legal test*)
+    answer_board_test "start board1 answer 3 in row 4 col 2" start_board 4 2 3
+      board1 board1_4x4grid;
+    (*start grid answer illegal test*)
+    answer_board_test "start board1 answer 1 in row 5 col 2" start_board 5 2 1
+      board1 [||];
+    answer_board_test "start board1 answer 1 in row 2 col 6" start_board 2 6 1
+      board1 [||];
+    answer_board_test "start board1 answer 10 in row 2 col 2" start_board 2 2 10
+      board1 [||];
+    answer_board_test "start board1 answer 1 in row 1 col 1" start_board 1 1 1
+      board1 [||];
+    answer_board_test "start board423 answer 9 in row 4 col 2" start_board 4 2 9
+      board423 [||];
+    (*check win test*)
+    check_win_test "completed board check win" board_complete true;
+    check_win_test "completed invalid board check win" board_invalid false;
+    (*solve tests*)
+    solve_board_test "board1 check solve" board1 true;
+    solve_board_test "board423 check solve" board423 true;
+    solve_board_test "board321 check solve" board321 true
+    (*solve error tests*)
+    (*hint tests*);
   ]
 
 let boardmaker_tests = []
