@@ -168,6 +168,12 @@ let answer_board_test name f (row : int) (col : int) (value : int)
 let check_win_test name (state : State.t) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (check_win state)
 
+let solve_board_test name (state : State.t) expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (check_win (solve_board state))
+
+let solve_board_error_test name (state : State.t) expected_error : test =
+  name >:: fun _ -> assert_raises expected_error (fun () -> solve_board state)
+
 let extract_state (f : string) (row : int) (col : int) (value : int)
     (state : State.t) =
   match f with
@@ -265,6 +271,12 @@ let state_tests =
     check_win_test "completed invalid board check win after answer"
       board_invalid_win false;
     check_win_test "board1 check win" board1 false;
+    (*solve tests*)
+    solve_board_test "board1 check solve" board1 true;
+    solve_board_test "board_incomplete check solve" board_incomplete true
+    (*solve error tests*);
+    solve_board_error_test "board221 check not solvable" board221
+      (UnsolvableBoard board221);
   ]
 
 let delete_board_test name f (row : int) (col : int) (state : State.t)

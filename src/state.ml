@@ -8,6 +8,8 @@ type t = {
   current_board : int array array;
 }
 
+exception UnsolvableBoard of t
+
 let deep_copy_board board =
   let new_board = Array.init 9 (fun _ -> Array.init 9 (fun _ -> 0)) in
   for i = 0 to 8 do
@@ -189,7 +191,7 @@ let solve_board brd =
   in
   try
     helper 0 0 board_curr;
-    raise Not_found
+    raise (UnsolvableBoard brd)
   with Exit ->
     ();
     brd
