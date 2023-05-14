@@ -87,6 +87,8 @@ let get_col (st : t) (colnum : int) : int array =
     (fun row -> (current_board st).(row).(colnum - 1))
 
 let get_block (st : t) ((blockrow, blockcol) : int * int) : int array =
+  if blockrow > 3 then raise (InvalidAnswer blockrow);
+  if blockcol > 3 then raise (InvalidAnswer blockcol);
   let grid_edge = Array.length (current_board st) in
   let block_edge = int_of_float (sqrt (float_of_int grid_edge)) in
   let result =
@@ -95,12 +97,8 @@ let get_block (st : t) ((blockrow, blockcol) : int * int) : int array =
         let col_value = ((blockcol - 1) * block_edge) + (cell mod block_edge) in
         (current_board st).(row_value).(col_value))
   in
-  let _ =
-    print_endline
-      (List.fold_left
-         (fun acc x -> acc ^ string_of_int x)
-         "" (result |> Array.to_list))
-  in
+  (* let _ = print_endline (List.fold_left (fun acc x -> acc ^ string_of_int x)
+     "" (result |> Array.to_list)) in *)
   result
 
 let get_cell (st : t) ((row, col) : int * int) : int =
@@ -169,6 +167,7 @@ let check_valid board row col =
   let arr = board in
   let row_set = ref SS.empty in
   let col_set = ref SS.empty in
+  let block_set = ref SS.empty in
   let flag = ref true in
   for i = 0 to board_size - 1 do
     if arr.(row).(i) <> 0 && SS.mem arr.(row).(i) !row_set then flag := false
@@ -177,6 +176,12 @@ let check_valid board row col =
   for i = 0 to board_size - 1 do
     if arr.(i).(col) <> 0 && SS.mem arr.(i).(col) !col_set then flag := false
     else col_set := SS.add arr.(i).(col) !col_set
+  done;
+  let block = get_block (init_state board) (1 + (row / 3), 1 + (col / 3)) in
+  let block_size = Array.length block in
+  for i = 0 to block_size - 1 do
+    if block.(i) <> 0 && SS.mem block.(i) !block_set then flag := false
+    else block_set := SS.add block.(i) !block_set
   done;
   !flag
 
