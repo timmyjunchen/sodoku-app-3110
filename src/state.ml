@@ -202,6 +202,7 @@ let solve_board brd =
   let board_size = board_size brd in
   let board_curr = brd.current_board in
   let rec helper row col board =
+    if row >= board_size && col >= board_size then raise Exit;
     if board.(row).(col) == 0 then (
       for i = 1 to board_size do
         board.(row).(col) <- i;
@@ -212,8 +213,10 @@ let solve_board brd =
         else ()
       done;
       board.(row).(col) <- 0)
-    else if col == board_size - 1 then helper (row + 1) 0 board
-    else helper row (col + 1) board
+    else (
+      if row == board_size - 1 && col == board_size - 1 then raise Exit;
+      if col == board_size - 1 then helper (row + 1) 0 board
+      else helper row (col + 1) board)
   in
   try
     helper 0 0 board_curr;
