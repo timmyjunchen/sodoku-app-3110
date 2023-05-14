@@ -87,8 +87,6 @@ let get_col (st : t) (colnum : int) : int array =
     (fun row -> (current_board st).(row).(colnum - 1))
 
 let get_block (st : t) ((blockrow, blockcol) : int * int) : int array =
-  if blockrow > 3 then raise (InvalidAnswer blockrow);
-  if blockcol > 3 then raise (InvalidAnswer blockcol);
   let grid_edge = Array.length (current_board st) in
   let block_edge = int_of_float (sqrt (float_of_int grid_edge)) in
   let result =
