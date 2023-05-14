@@ -68,48 +68,52 @@ let command_tests =
 (*****************************************************************)
 
 (* 9 x 9 grids*)
-let data_dir_prefix = "grids" ^ Filename.dir_sep
+let data_dir_prefix9x9 = "grids" ^ Filename.dir_sep ^ "9x9" ^ Filename.dir_sep
 
 let board1_grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board1_grid.json") |> from_json
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "board1_grid.json") |> from_json
 
 let board1_grid_2_2_1 =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board1_grid_2_2_1.json")
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "board1_grid_2_2_1.json")
   |> from_json
 
 let board221_grid_4_9_3 =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board221_grid_4_9_3.json")
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "board221_grid_4_9_3.json")
   |> from_json
 
 let almost_completed_grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "almost_completed_grid.json")
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "almost_completed_grid.json")
   |> from_json
 
 let completed_grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "completed_grid.json") |> from_json
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "completed_grid.json")
+  |> from_json
 
 let completed_invalid_grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "completed_invalid_grid.json")
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "completed_invalid_grid.json")
   |> from_json
 
 (* 2 x 2 grids*)
+let data_dir_prefix4x4 = "grids" ^ Filename.dir_sep ^ "4x4" ^ Filename.dir_sep
+
 let board1_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board1_4x4grid.json") |> from_json
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "board1_4x4grid.json")
+  |> from_json
 
 let board423_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board423_4x4grid.json")
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "board423_4x4grid.json")
   |> from_json
 
 let completed_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "completed_4x4grid.json")
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "completed_4x4grid.json")
   |> from_json
 
 let completed_invalid_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "completed_invalid_4x4grid.json")
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "completed_invalid_4x4grid.json")
   |> from_json
 
 let board321_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board321_4x4grid.json")
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "board321_4x4grid.json")
   |> from_json
 
 let start_board_test name (state : State.t) expected_output : test =
