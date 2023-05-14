@@ -5,7 +5,9 @@
     cause the state to change.
 
     This module also handles loading of the sudoku board from JSON as well as
-    querying information about the sudoku board. *)
+    querying information about the sudoku board.
+
+    Some specifications adapted from A2*)
 
 exception InvalidBox of int * int
 (** Raised when a cell given the row and columns does not exist on the board. It
