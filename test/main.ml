@@ -349,6 +349,7 @@ let state_tests4x4 =
   let board321 = extract_state "answer" 3 2 1 board423 in
   let board_complete = init_state completed_4x4grid in
   let board_invalid = init_state completed_invalid_4x4grid in
+  let board1_hint = extract_state "hint" 0 0 0 board1 in
   [
     (*start board tests*)
     start_board_test "board 1 start" board1 board1_4x4grid;
@@ -426,9 +427,45 @@ let state_tests4x4 =
     (*solve tests*)
     solve_board_test "board1 check solve" board1 true;
     solve_board_test "board423 check solve" board423 true;
-    solve_board_test "board321 check solve" board321 true
-    (*solve error tests*)
-    (*hint tests*);
+    solve_board_test "board321 check solve" board321 true;
+    (*hint tests*)
+    solve_board_test "board1 check hint" board1_hint true;
+  ]
+
+let delete_tests4x4 =
+  let board1 = init_state board1_4x4grid in
+  let board423 = extract_state "answer" 4 2 3 board1 in
+  let board321 = extract_state "answer" 3 2 1 board423 in
+
+  [
+    (*current grid delete legal test*)
+    delete_board_test "current delete board423 row 4 col 2" current_board 4 2
+      board423 board1_4x4grid;
+    delete_board_test "current delete board321 row 3 col 2" current_board 3 2
+      board321 board423_4x4grid;
+    (*current grid delete illegal test*)
+    delete_board_test "current board1 delete in row 6 col 2" current_board 6 2
+      board1 [||];
+    delete_board_test "current board1 delete in row 2 col 6" current_board 2 6
+      board1 [||];
+    delete_board_test "current board1 delete in row 1 col 1" current_board 1 1
+      board1 [||];
+    delete_board_test "current board423 delete in row 2 col 2" current_board 2 2
+      board423 [||];
+    (*start grid delete legal test*)
+    delete_board_test "start delete board423 row 4 col 2" start_board 4 2
+      board423 board1_4x4grid;
+    delete_board_test "start delete board321 row 3 col 2" start_board 3 2
+      board321 board1_4x4grid;
+    (*start grid delete illegal test*)
+    delete_board_test "start board1 delete in row 5 col 2" start_board 5 2
+      board1 [||];
+    delete_board_test "start board1 delete in row 2 col 5" start_board 2 5
+      board1 [||];
+    delete_board_test "start board1 delete in row 1 col 1" start_board 1 1
+      board1 [||];
+    delete_board_test "start board423 delete in row 2 col 2" start_board 2 2
+      board423 [||];
   ]
 
 let empty_board = Array.make_matrix 9 9 0
@@ -527,6 +564,7 @@ let suite =
            state_tests9x9;
            state_tests4x4;
            delete_tests9x9;
+           delete_tests4x4;
            boardmaker_tests;
          ]
 
