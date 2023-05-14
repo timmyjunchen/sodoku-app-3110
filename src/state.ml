@@ -175,7 +175,9 @@ let check_valid board row col =
     if arr.(i).(col) <> 0 && SS.mem arr.(i).(col) !col_set then flag := false
     else col_set := SS.add arr.(i).(col) !col_set
   done;
-  let block = get_block (init_state board) (1 + (row / 3), 1 + (col / 3)) in
+  let block =
+    get_block (init_state board) (1 + (row / board_size), 1 + (col / board_size))
+  in
   let block_size = Array.length block in
   for i = 0 to block_size - 1 do
     if block.(i) <> 0 && SS.mem block.(i) !block_set then flag := false
