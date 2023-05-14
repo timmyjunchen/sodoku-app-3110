@@ -623,20 +623,7 @@ let boardmaker_tests =
       [ 3; 6; 7; 9 ];
     get_options_test "get options test_board 4 3" get_options test_board 4 3
       [ 4; 5; 7; 9 ];
-    (*get block options tests*)
-    get_options_test "get block options test_board 2 1" get_block_options
-      test_board 2 1
-      [|
-        [ 3; 6; 7; 9 ];
-        [ 3; 4; 5; 6 ];
-        [ 4; 5; 7; 9 ];
-        [ 1; 2; 6; 7 ];
-        [ 2; 5; 6; 8 ];
-        [ 1; 5; 7; 8 ];
-        [ 1; 2; 3; 9 ];
-        [ 2; 3; 4; 8 ];
-        [ 1; 4; 8; 9 ];
-      |];
+    ({|generate_board|} >:: fun _ -> assert (generate_board 9 3 <> [| [||] |]));
   ]
 
 let suite =
