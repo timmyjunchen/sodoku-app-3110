@@ -1,6 +1,5 @@
 open OUnit2
 open Sudoku
-open Grid
 open Command
 open State
 open Boardmaker
@@ -68,48 +67,77 @@ let command_tests =
 (*****************************************************************)
 
 (* 9 x 9 grids*)
-let data_dir_prefix = "grids" ^ Filename.dir_sep
+let data_dir_prefix9x9 = "grids" ^ Filename.dir_sep ^ "9x9" ^ Filename.dir_sep
 
 let board1_grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board1_grid.json") |> from_json
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "board1_grid.json") |> from_json
 
 let board1_grid_2_2_1 =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board1_grid_2_2_1.json")
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "board1_grid_2_2_1.json")
   |> from_json
 
 let board221_grid_4_9_3 =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board221_grid_4_9_3.json")
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "board221_grid_4_9_3.json")
   |> from_json
 
 let almost_completed_grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "almost_completed_grid.json")
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "almost_completed_grid.json")
   |> from_json
 
 let completed_grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "completed_grid.json") |> from_json
-
-let completed_invalid_grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "completed_invalid_grid.json")
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "completed_grid.json")
   |> from_json
 
-(* 2 x 2 grids*)
+let completed_invalid_grid =
+  Yojson.Basic.from_file (data_dir_prefix9x9 ^ "completed_invalid_grid.json")
+  |> from_json
+
+(* 4 x 4 grids*)
+let data_dir_prefix4x4 = "grids" ^ Filename.dir_sep ^ "4x4" ^ Filename.dir_sep
+
 let board1_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board1_4x4grid.json") |> from_json
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "board1_4x4grid.json")
+  |> from_json
 
 let board423_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board423_4x4grid.json")
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "board423_4x4grid.json")
   |> from_json
 
 let completed_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "completed_4x4grid.json")
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "completed_4x4grid.json")
   |> from_json
 
 let completed_invalid_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "completed_invalid_4x4grid.json")
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "completed_invalid_4x4grid.json")
   |> from_json
 
 let board321_4x4grid =
-  Yojson.Basic.from_file (data_dir_prefix ^ "board321_4x4grid.json")
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "board321_4x4grid.json")
+  |> from_json
+
+(* 16 x 16 grids*)
+let data_dir_prefix16x16 =
+  "grids" ^ Filename.dir_sep ^ "16x16" ^ Filename.dir_sep
+
+let board1_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "board1_16x16grid.json")
+  |> from_json
+
+let board15511_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "board15511_16x16grid.json")
+  |> from_json
+
+let board21313_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "board21313_16x16grid.json")
+  |> from_json
+
+let completed_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "completed_16x16grid.json")
+  |> from_json
+
+let completed_invalid_16x16grid =
+  Yojson.Basic.from_file
+    (data_dir_prefix16x16 ^ "completed_invalid_16x16grid.json")
   |> from_json
 
 let start_board_test name (state : State.t) expected_output : test =
@@ -349,6 +377,7 @@ let state_tests4x4 =
   let board321 = extract_state "answer" 3 2 1 board423 in
   let board_complete = init_state completed_4x4grid in
   let board_invalid = init_state completed_invalid_4x4grid in
+  let board1_hint = extract_state "hint" 0 0 0 board1 in
   [
     (*start board tests*)
     start_board_test "board 1 start" board1 board1_4x4grid;
@@ -426,97 +455,188 @@ let state_tests4x4 =
     (*solve tests*)
     solve_board_test "board1 check solve" board1 true;
     solve_board_test "board423 check solve" board423 true;
-    solve_board_test "board321 check solve" board321 true
-    (*solve error tests*)
-    (*hint tests*);
+    solve_board_test "board321 check solve" board321 true;
+    (*hint tests*)
+    solve_board_test "board1 check hint" board1_hint true;
   ]
+
+let delete_tests4x4 =
+  let board1 = init_state board1_4x4grid in
+  let board423 = extract_state "answer" 4 2 3 board1 in
+  let board321 = extract_state "answer" 3 2 1 board423 in
+
+  [
+    (*current grid delete legal test*)
+    delete_board_test "current delete board423 row 4 col 2" current_board 4 2
+      board423 board1_4x4grid;
+    delete_board_test "current delete board321 row 3 col 2" current_board 3 2
+      board321 board423_4x4grid;
+    (*current grid delete illegal test*)
+    delete_board_test "current board1 delete in row 6 col 2" current_board 6 2
+      board1 [||];
+    delete_board_test "current board1 delete in row 2 col 6" current_board 2 6
+      board1 [||];
+    delete_board_test "current board1 delete in row 1 col 1" current_board 1 1
+      board1 [||];
+    delete_board_test "current board423 delete in row 2 col 2" current_board 2 2
+      board423 [||];
+    (*start grid delete legal test*)
+    delete_board_test "start delete board423 row 4 col 2" start_board 4 2
+      board423 board1_4x4grid;
+    delete_board_test "start delete board321 row 3 col 2" start_board 3 2
+      board321 board1_4x4grid;
+    (*start grid delete illegal test*)
+    delete_board_test "start board1 delete in row 5 col 2" start_board 5 2
+      board1 [||];
+    delete_board_test "start board1 delete in row 2 col 5" start_board 2 5
+      board1 [||];
+    delete_board_test "start board1 delete in row 1 col 1" start_board 1 1
+      board1 [||];
+    delete_board_test "start board423 delete in row 2 col 2" start_board 2 2
+      board423 [||];
+  ]
+
+let state_tests16x16 =
+  let board1 = init_state board1_16x16grid in
+  let board15511 = init_state board15511_16x16grid in
+  let board21313 = extract_state "answer" 2 13 13 board15511 in
+  let board_complete = init_state completed_16x16grid in
+  let board_invalid = init_state completed_invalid_16x16grid in
+  [
+    (*start tests*)
+    start_board_test "board 1 start" board1 board1_16x16grid;
+    start_board_test "board 15511 start" board15511 board15511_16x16grid;
+    start_board_test "board 21313 start after answer" board21313
+      board15511_16x16grid;
+    (*current tests*)
+    current_board_test "board 1 current" board1 board1_16x16grid;
+    current_board_test "board 15511 current" board15511 board15511_16x16grid;
+    (*row test*)
+    get_rc_test "board 1 get row 12" get_row board1 12
+      [| 0; 0; 13; 8; 12; 14; 4; 0; 0; 0; 16; 0; 3; 0; 0; 0 |];
+    get_rc_test "board 21313 get row 2" get_row board21313 2
+      [| 5; 9; 4; 1; 8; 0; 0; 0; 0; 0; 6; 15; 13; 2; 3; 11 |];
+    (*col test*)
+    get_rc_test "board 1 get col 3" get_col board1 3
+      [| 0; 4; 8; 0; 0; 14; 0; 0; 0; 10; 5; 13; 9; 3; 7; 0 |];
+    get_rc_test "board 21313 get col 13" get_col board21313 13
+      [| 7; 13; 0; 1; 0; 0; 0; 0; 5; 4; 14; 3; 6; 0; 0; 0 |];
+    (*block test*)
+    get_bc_test "board 1 get block 3 4" get_block board1 (3, 4)
+      [| 5; 0; 0; 6; 4; 0; 0; 2; 14; 16; 0; 0; 3; 0; 0; 0 |];
+    get_bc_test "board 21313 get block 1 4" get_block board21313 (1, 4)
+      [| 7; 6; 0; 0; 13; 2; 3; 11; 0; 0; 0; 16; 1; 8; 0; 9 |];
+    (*cell test*)
+    get_bc_test "board 1 get cell 11 14" get_cell board1 (11, 14) 16;
+    get_bc_test "board 21313 get cell 2 13" get_cell board21313 (2, 13) 13;
+    (*next grid test*)
+    next_grid_test "put 11 in row 15 col 5" board1 15 5 11 board15511_16x16grid;
+    next_grid_test "put 13 in row 2 col 13" board15511 2 13 13
+      board21313_16x16grid;
+    (*next grid error test*)
+    next_grid_error_test "invalid row" board1 25 2 1 (InvalidBox (25, 2));
+    next_grid_error_test "invalid col" board1 2 17 1 (InvalidBox (2, 17));
+    next_grid_error_test "cell is filled" board1 1 1 1 (InvalidBox (1, 1));
+    next_grid_error_test "invalid answer" board1 2 6 17 (InvalidAnswer 17);
+    (*current grid answer legal test*)
+    answer_board_test "current board1 answer 11 in row 15 col 5" current_board
+      15 5 11 board1 board15511_16x16grid;
+    (*current grid answer illegal test*)
+    answer_board_test "current board1 answer 1 in row 17 col 2" current_board 17
+      2 1 board1 [||];
+    answer_board_test "current board1 answer 1 in row 2 col 26" current_board 2
+      26 1 board1 [||];
+    answer_board_test "current board1 answer 100 in row 2 col 2" current_board 2
+      2 100 board1 [||];
+    answer_board_test "current board1 answer 1 in row 1 col 1" current_board 1 1
+      1 board1 [||];
+    answer_board_test "current board423 answer 9 in row 4 col 5" current_board 4
+      5 9 board15511 [||];
+    (*start grid answer legal test*)
+    answer_board_test "start board1 answer 11 in row 15 col 5" start_board 15 5
+      11 board1 board1_16x16grid;
+    (*start grid answer illegal test*)
+    answer_board_test "start board1 answer 1 in row 17 col 2" start_board 17 2 1
+      board1 [||];
+    answer_board_test "start board1 answer 1 in row 2 col 26" start_board 2 26 1
+      board1 [||];
+    answer_board_test "start board1 answer 100 in row 2 col 2" start_board 2 2
+      100 board1 [||];
+    answer_board_test "start board1 answer 1 in row 1 col 1" start_board 1 1 1
+      board1 [||];
+    answer_board_test "start board423 answer 9 in row 4 col 5" start_board 4 5 9
+      board15511 [||];
+    (*check win test*)
+    check_win_test "completed board check win" board_complete true;
+    (*check win test*)
+    check_win_test "completed invalid board check win" board_invalid false;
+  ]
+
+(*****************************************************************)
+(* Board Generation Tests *)
+(*****************************************************************)
+
+let data_dir_prefix_generation =
+  "grids" ^ Filename.dir_sep ^ "board_generation" ^ Filename.dir_sep
 
 let empty_board = Array.make_matrix 9 9 0
 
 let partially_filled_board =
-  [|
-    [| 2; 0; 0; 3; 0; 0; 0; 0; 0 |];
-    [| 8; 1; 4; 0; 6; 2; 0; 0; 3 |];
-    [| 0; 1; 3; 8; 0; 0; 2; 0; 0 |];
-    [| 0; 0; 0; 0; 2; 0; 3; 9; 0 |];
-    [| 5; 0; 7; 0; 0; 0; 6; 2; 1 |];
-    [| 0; 3; 2; 0; 0; 6; 0; 0; 0 |];
-    [| 0; 2; 0; 0; 0; 9; 1; 4; 0 |];
-    [| 6; 0; 1; 2; 5; 0; 8; 0; 9 |];
-    [| 0; 0; 0; 0; 0; 1; 0; 0; 2 |];
-  |]
+  Yojson.Basic.from_file
+    (data_dir_prefix_generation ^ "partially_filled_board.json")
+  |> from_json
 
 let filled_board =
-  [|
-    [| 2; 1; 1; 3; 1; 1; 1; 1; 1 |];
-    [| 8; 1; 4; 1; 6; 2; 1; 1; 3 |];
-    [| 1; 1; 3; 8; 1; 1; 2; 1; 1 |];
-    [| 1; 1; 1; 1; 2; 1; 3; 9; 1 |];
-    [| 5; 1; 7; 1; 1; 1; 6; 1; 1 |];
-    [| 1; 3; 2; 1; 1; 6; 1; 1; 1 |];
-    [| 1; 2; 1; 1; 1; 9; 1; 4; 1 |];
-    [| 6; 1; 1; 2; 5; 1; 8; 1; 9 |];
-    [| 1; 1; 1; 1; 1; 1; 1; 1; 2 |];
-  |]
+  Yojson.Basic.from_file (data_dir_prefix_generation ^ "filled_board.json")
+  |> from_json
 
 let almost_filled_board =
-  [|
-    [| 2; 1; 1; 3; 1; 1; 1; 1; 1 |];
-    [| 8; 1; 4; 1; 6; 2; 1; 1; 3 |];
-    [| 1; 1; 3; 8; 1; 1; 2; 1; 1 |];
-    [| 1; 1; 1; 1; 2; 1; 3; 9; 1 |];
-    [| 5; 1; 7; 1; 1; 1; 6; 1; 1 |];
-    [| 1; 3; 2; 1; 1; 6; 1; 1; 1 |];
-    [| 1; 2; 1; 1; 1; 9; 1; 4; 1 |];
-    [| 6; 1; 1; 2; 5; 1; 8; 1; 9 |];
-    [| 1; 1; 1; 1; 1; 1; 1; 1; 0 |];
-  |]
+  Yojson.Basic.from_file
+    (data_dir_prefix_generation ^ "almost_filled_board.json")
+  |> from_json
 
 let test_board =
-  [|
-    [| 8; 9; 2; 0; 0; 0; 0; 0; 0 |];
-    [| 4; 1; 6; 0; 0; 0; 0; 0; 0 |];
-    [| 5; 7; 3; 0; 0; 0; 0; 0; 0 |];
-    [| 0; 0; 0; 1; 2; 8; 0; 0; 0 |];
-    [| 0; 0; 0; 9; 4; 3; 0; 0; 0 |];
-    [| 0; 0; 0; 7; 6; 5; 0; 0; 0 |];
-    [| 0; 0; 0; 0; 0; 0; 9; 1; 5 |];
-    [| 0; 0; 0; 0; 0; 0; 7; 2; 6 |];
-    [| 0; 0; 0; 0; 0; 0; 8; 4; 3 |];
-  |]
+  Yojson.Basic.from_file (data_dir_prefix_generation ^ "test_board.json")
+  |> from_json
+
+let shuffle_list_test name (lst : int list) expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (lst <> shuffle lst)
+
+let board_filled_test name (board : int array array) expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (board_filled board)
+
+let get_options_test name f (board : int array array) (row : int) (col : int)
+    expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (f board row col)
 
 let boardmaker_tests =
   [
-    ( {|shuffle list|} >:: fun _ ->
-      assert (
-        shuffle [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] <> [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ])
-    );
-    ( {|board_filled empty|} >:: fun _ ->
-      assert_equal (board_filled empty_board) false );
-    ( {|board_filled partial|} >:: fun _ ->
-      assert_equal (board_filled partially_filled_board) false );
-    ( {|board_filled filled|} >:: fun _ ->
-      assert_equal (board_filled filled_board) true );
-    ( {|board_filled almost|} >:: fun _ ->
-      assert_equal (board_filled almost_filled_board) false );
-    ( {|get_options test|} >:: fun _ ->
-      assert_equal (get_options test_board 4 1) [ 3; 6; 7; 9 ] );
-    ( {|get_options test 2|} >:: fun _ ->
-      assert_equal (get_options test_board 4 3) [ 4; 5; 7; 9 ] );
-    ( {|get_block_options test|} >:: fun _ ->
-      assert_equal
-        (get_block_options test_board 2 1)
-        [|
-          [ 3; 6; 7; 9 ];
-          [ 3; 4; 5; 6 ];
-          [ 4; 5; 7; 9 ];
-          [ 1; 2; 6; 7 ];
-          [ 2; 5; 6; 8 ];
-          [ 1; 5; 7; 8 ];
-          [ 1; 2; 3; 9 ];
-          [ 2; 3; 4; 8 ];
-          [ 1; 4; 8; 9 ];
-        |] );
+    (*shuffle lists tests*)
+    shuffle_list_test "shuffled list 1-9" [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] true;
+    (*board filled tests*)
+    board_filled_test "board_filled empty" empty_board false;
+    board_filled_test "board_filled partial" partially_filled_board false;
+    board_filled_test "board_filled almost" almost_filled_board false;
+    board_filled_test "board_filled filled" filled_board true;
+    (*get options tests*)
+    get_options_test "get options test_board 4 1" get_options test_board 4 1
+      [ 3; 6; 7; 9 ];
+    get_options_test "get options test_board 4 3" get_options test_board 4 3
+      [ 4; 5; 7; 9 ];
+    (*get block options tests*)
+    get_options_test "get block options test_board 2 1" get_block_options
+      test_board 2 1
+      [|
+        [ 3; 6; 7; 9 ];
+        [ 3; 4; 5; 6 ];
+        [ 4; 5; 7; 9 ];
+        [ 1; 2; 6; 7 ];
+        [ 2; 5; 6; 8 ];
+        [ 1; 5; 7; 8 ];
+        [ 1; 2; 3; 9 ];
+        [ 2; 3; 4; 8 ];
+        [ 1; 4; 8; 9 ];
+      |];
   ]
 
 let suite =
@@ -527,6 +647,8 @@ let suite =
            state_tests9x9;
            state_tests4x4;
            delete_tests9x9;
+           delete_tests4x4;
+           state_tests16x16;
            boardmaker_tests;
          ]
 
