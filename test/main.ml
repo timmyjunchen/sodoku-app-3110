@@ -93,7 +93,7 @@ let completed_invalid_grid =
   Yojson.Basic.from_file (data_dir_prefix9x9 ^ "completed_invalid_grid.json")
   |> from_json
 
-(* 2 x 2 grids*)
+(* 4 x 4 grids*)
 let data_dir_prefix4x4 = "grids" ^ Filename.dir_sep ^ "4x4" ^ Filename.dir_sep
 
 let board1_4x4grid =
@@ -114,6 +114,31 @@ let completed_invalid_4x4grid =
 
 let board321_4x4grid =
   Yojson.Basic.from_file (data_dir_prefix4x4 ^ "board321_4x4grid.json")
+  |> from_json
+
+(* 16 x 16 grids*)
+let data_dir_prefix16x16 =
+  "grids" ^ Filename.dir_sep ^ "16x16" ^ Filename.dir_sep
+
+let board1_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "board1_16x16grid.json")
+  |> from_json
+
+let board15511_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "board15511_16x16grid.json")
+  |> from_json
+
+let board21313_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "board21313_16x16grid.json")
+  |> from_json
+
+let completed_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "completed_16x16grid.json")
+  |> from_json
+
+let completed_invalid_16x16grid =
+  Yojson.Basic.from_file
+    (data_dir_prefix16x16 ^ "completed_invalid_16x16grid.json")
   |> from_json
 
 let start_board_test name (state : State.t) expected_output : test =
@@ -472,6 +497,82 @@ let delete_tests4x4 =
       board423 [||];
   ]
 
+let state_tests16x16 =
+  let board1 = init_state board1_16x16grid in
+  let board15511 = init_state board15511_16x16grid in
+  let board21313 = extract_state "answer" 2 13 13 board15511 in
+  let board_complete = init_state completed_16x16grid in
+  let board_invalid = init_state completed_invalid_16x16grid in
+  [
+    (*start tests*)
+    start_board_test "board 1 start" board1 board1_16x16grid;
+    start_board_test "board 15511 start" board15511 board15511_16x16grid;
+    start_board_test "board 21313 start after answer" board21313
+      board15511_16x16grid;
+    (*current tests*)
+    current_board_test "board 1 current" board1 board1_16x16grid;
+    current_board_test "board 15511 current" board15511 board15511_16x16grid;
+    (*row test*)
+    get_rc_test "board 1 get row 12" get_row board1 12
+      [| 0; 0; 13; 8; 12; 14; 4; 0; 0; 0; 16; 0; 3; 0; 0; 0 |];
+    get_rc_test "board 21313 get row 2" get_row board21313 2
+      [| 5; 9; 4; 1; 8; 0; 0; 0; 0; 0; 6; 15; 13; 2; 3; 11 |];
+    (*col test*)
+    get_rc_test "board 1 get col 3" get_col board1 3
+      [| 0; 4; 8; 0; 0; 14; 0; 0; 0; 10; 5; 13; 9; 3; 7; 0 |];
+    get_rc_test "board 21313 get col 13" get_col board21313 13
+      [| 7; 13; 0; 1; 0; 0; 0; 0; 5; 4; 14; 3; 6; 0; 0; 0 |];
+    (*block test*)
+    get_bc_test "board 1 get block 3 4" get_block board1 (3, 4)
+      [| 5; 0; 0; 6; 4; 0; 0; 2; 14; 16; 0; 0; 3; 0; 0; 0 |];
+    get_bc_test "board 21313 get block 1 4" get_block board21313 (1, 4)
+      [| 7; 6; 0; 0; 13; 2; 3; 11; 0; 0; 0; 16; 1; 8; 0; 9 |];
+    (*cell test*)
+    get_bc_test "board 1 get cell 11 14" get_cell board1 (11, 14) 16;
+    get_bc_test "board 21313 get cell 2 13" get_cell board21313 (2, 13) 13;
+    (*next grid test*)
+    next_grid_test "put 11 in row 15 col 5" board1 15 5 11 board15511_16x16grid;
+    next_grid_test "put 13 in row 2 col 13" board15511 2 13 13
+      board21313_16x16grid;
+    (*next grid error test*)
+    next_grid_error_test "invalid row" board1 25 2 1 (InvalidBox (25, 2));
+    next_grid_error_test "invalid col" board1 2 17 1 (InvalidBox (2, 17));
+    next_grid_error_test "cell is filled" board1 1 1 1 (InvalidBox (1, 1));
+    next_grid_error_test "invalid answer" board1 2 6 17 (InvalidAnswer 17);
+    (*current grid answer legal test*)
+    answer_board_test "current board1 answer 11 in row 15 col 5" current_board
+      15 5 11 board1 board15511_16x16grid;
+    (*current grid answer illegal test*)
+    answer_board_test "current board1 answer 1 in row 17 col 2" current_board 17
+      2 1 board1 [||];
+    answer_board_test "current board1 answer 1 in row 2 col 26" current_board 2
+      26 1 board1 [||];
+    answer_board_test "current board1 answer 100 in row 2 col 2" current_board 2
+      2 100 board1 [||];
+    answer_board_test "current board1 answer 1 in row 1 col 1" current_board 1 1
+      1 board1 [||];
+    answer_board_test "current board423 answer 9 in row 4 col 5" current_board 4
+      5 9 board15511 [||];
+    (*start grid answer legal test*)
+    answer_board_test "start board1 answer 11 in row 15 col 5" start_board 15 5
+      11 board1 board1_16x16grid;
+    (*start grid answer illegal test*)
+    answer_board_test "start board1 answer 1 in row 17 col 2" start_board 17 2 1
+      board1 [||];
+    answer_board_test "start board1 answer 1 in row 2 col 26" start_board 2 26 1
+      board1 [||];
+    answer_board_test "start board1 answer 100 in row 2 col 2" start_board 2 2
+      100 board1 [||];
+    answer_board_test "start board1 answer 1 in row 1 col 1" start_board 1 1 1
+      board1 [||];
+    answer_board_test "start board423 answer 9 in row 4 col 5" start_board 4 5 9
+      board15511 [||];
+    (*check win test*)
+    check_win_test "completed board check win" board_complete true;
+    (*check win test*)
+    check_win_test "completed invalid board check win" board_invalid false;
+  ]
+
 (*****************************************************************)
 (* Board Generation Tests *)
 (*****************************************************************)
@@ -548,6 +649,7 @@ let suite =
            state_tests4x4;
            delete_tests9x9;
            delete_tests4x4;
+           state_tests16x16;
            boardmaker_tests;
          ]
 
