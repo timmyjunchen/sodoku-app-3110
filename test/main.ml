@@ -472,92 +472,71 @@ let delete_tests4x4 =
       board423 [||];
   ]
 
+(*****************************************************************)
+(* Board Generation Tests *)
+(*****************************************************************)
+
+let data_dir_prefix_generation =
+  "grids" ^ Filename.dir_sep ^ "board_generation" ^ Filename.dir_sep
+
 let empty_board = Array.make_matrix 9 9 0
 
 let partially_filled_board =
-  [|
-    [| 2; 0; 0; 3; 0; 0; 0; 0; 0 |];
-    [| 8; 1; 4; 0; 6; 2; 0; 0; 3 |];
-    [| 0; 1; 3; 8; 0; 0; 2; 0; 0 |];
-    [| 0; 0; 0; 0; 2; 0; 3; 9; 0 |];
-    [| 5; 0; 7; 0; 0; 0; 6; 2; 1 |];
-    [| 0; 3; 2; 0; 0; 6; 0; 0; 0 |];
-    [| 0; 2; 0; 0; 0; 9; 1; 4; 0 |];
-    [| 6; 0; 1; 2; 5; 0; 8; 0; 9 |];
-    [| 0; 0; 0; 0; 0; 1; 0; 0; 2 |];
-  |]
+  Yojson.Basic.from_file
+    (data_dir_prefix_generation ^ "partially_filled_board.json")
+  |> from_json
 
 let filled_board =
-  [|
-    [| 2; 1; 1; 3; 1; 1; 1; 1; 1 |];
-    [| 8; 1; 4; 1; 6; 2; 1; 1; 3 |];
-    [| 1; 1; 3; 8; 1; 1; 2; 1; 1 |];
-    [| 1; 1; 1; 1; 2; 1; 3; 9; 1 |];
-    [| 5; 1; 7; 1; 1; 1; 6; 1; 1 |];
-    [| 1; 3; 2; 1; 1; 6; 1; 1; 1 |];
-    [| 1; 2; 1; 1; 1; 9; 1; 4; 1 |];
-    [| 6; 1; 1; 2; 5; 1; 8; 1; 9 |];
-    [| 1; 1; 1; 1; 1; 1; 1; 1; 2 |];
-  |]
+  Yojson.Basic.from_file (data_dir_prefix_generation ^ "filled_board.json")
+  |> from_json
 
 let almost_filled_board =
-  [|
-    [| 2; 1; 1; 3; 1; 1; 1; 1; 1 |];
-    [| 8; 1; 4; 1; 6; 2; 1; 1; 3 |];
-    [| 1; 1; 3; 8; 1; 1; 2; 1; 1 |];
-    [| 1; 1; 1; 1; 2; 1; 3; 9; 1 |];
-    [| 5; 1; 7; 1; 1; 1; 6; 1; 1 |];
-    [| 1; 3; 2; 1; 1; 6; 1; 1; 1 |];
-    [| 1; 2; 1; 1; 1; 9; 1; 4; 1 |];
-    [| 6; 1; 1; 2; 5; 1; 8; 1; 9 |];
-    [| 1; 1; 1; 1; 1; 1; 1; 1; 0 |];
-  |]
+  Yojson.Basic.from_file
+    (data_dir_prefix_generation ^ "almost_filled_board.json")
+  |> from_json
 
 let test_board =
-  [|
-    [| 8; 9; 2; 0; 0; 0; 0; 0; 0 |];
-    [| 4; 1; 6; 0; 0; 0; 0; 0; 0 |];
-    [| 5; 7; 3; 0; 0; 0; 0; 0; 0 |];
-    [| 0; 0; 0; 1; 2; 8; 0; 0; 0 |];
-    [| 0; 0; 0; 9; 4; 3; 0; 0; 0 |];
-    [| 0; 0; 0; 7; 6; 5; 0; 0; 0 |];
-    [| 0; 0; 0; 0; 0; 0; 9; 1; 5 |];
-    [| 0; 0; 0; 0; 0; 0; 7; 2; 6 |];
-    [| 0; 0; 0; 0; 0; 0; 8; 4; 3 |];
-  |]
+  Yojson.Basic.from_file (data_dir_prefix_generation ^ "test_board.json")
+  |> from_json
+
+let shuffle_list_test name (lst : int list) expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (lst <> shuffle lst)
+
+let board_filled_test name (board : int array array) expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (board_filled board)
+
+let get_options_test name f (board : int array array) (row : int) (col : int)
+    expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (f board row col)
 
 let boardmaker_tests =
   [
-    ( {|shuffle list|} >:: fun _ ->
-      assert (
-        shuffle [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] <> [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ])
-    );
-    ( {|board_filled empty|} >:: fun _ ->
-      assert_equal (board_filled empty_board) false );
-    ( {|board_filled partial|} >:: fun _ ->
-      assert_equal (board_filled partially_filled_board) false );
-    ( {|board_filled filled|} >:: fun _ ->
-      assert_equal (board_filled filled_board) true );
-    ( {|board_filled almost|} >:: fun _ ->
-      assert_equal (board_filled almost_filled_board) false );
-    ( {|get_options test|} >:: fun _ ->
-      assert_equal (get_options test_board 4 1) [ 3; 6; 7; 9 ] );
-    ( {|get_options test 2|} >:: fun _ ->
-      assert_equal (get_options test_board 4 3) [ 4; 5; 7; 9 ] );
-    ( {|get_block_options test|} >:: fun _ ->
-      assert_equal
-        (get_block_options test_board 2 1)
-        [|
-          [ 3; 6; 7; 9 ];
-          [ 3; 4; 5; 6 ];
-          [ 4; 5; 7; 9 ];
-          [ 1; 2; 6; 7 ];
-          [ 2; 5; 6; 8 ];
-          [ 1; 5; 7; 8 ];
-          [ 1; 2; 3; 9 ];
-          [ 2; 3; 4; 8 ];
-          [ 1; 4; 8; 9 ];
-        |] );
+    (*shuffle lists tests*)
+    shuffle_list_test "shuffled list 1-9" [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] true;
+    (*board filled tests*)
+    board_filled_test "board_filled empty" empty_board false;
+    board_filled_test "board_filled partial" partially_filled_board false;
+    board_filled_test "board_filled almost" almost_filled_board false;
+    board_filled_test "board_filled filled" filled_board true;
+    (*get options tests*)
+    get_options_test "get options test_board 4 1" get_options test_board 4 1
+      [ 3; 6; 7; 9 ];
+    get_options_test "get options test_board 4 3" get_options test_board 4 3
+      [ 4; 5; 7; 9 ];
+    (*get block options tests*)
+    get_options_test "get block options test_board 2 1" get_block_options
+      test_board 2 1
+      [|
+        [ 3; 6; 7; 9 ];
+        [ 3; 4; 5; 6 ];
+        [ 4; 5; 7; 9 ];
+        [ 1; 2; 6; 7 ];
+        [ 2; 5; 6; 8 ];
+        [ 1; 5; 7; 8 ];
+        [ 1; 2; 3; 9 ];
+        [ 2; 3; 4; 8 ];
+        [ 1; 4; 8; 9 ];
+      |];
   ]
 
 let suite =
