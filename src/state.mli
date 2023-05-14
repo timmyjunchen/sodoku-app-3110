@@ -1,8 +1,11 @@
-(** Representation of dynamic sudoku state.
+(** Representation of dynamic sudoku state and the static board data.
 
     This module represents the state of the sudoku grid as it is being played,
-    including the player's current grid, the cells that have been filled, and
-    functions that cause the state to change. *)
+    including the player's current grid, the starting grid, and functions that
+    cause the state to change.
+
+    This module also handles loading of the sudoku board from JSON as well as
+    querying information about the sudoku board. *)
 
 exception InvalidBox of int * int
 (** Raised when a cell given the row and columns does not exist on the board. It
@@ -13,6 +16,10 @@ exception InvalidAnswer of int
 (** Raised when a number to a cell is given that is invalid for the board. It
     carries the number of the inputted answer. Example: for a 9 x 9 board, the
     inputted answer is 10. *)
+
+val from_json : Yojson.Basic.t -> int array array
+(** [from_json json] is the board that [json] represents. Requires: [j] is a
+    valid JSON sudoku board representation. *)
 
 type t
 (** The abstract type of values representing the game state. *)

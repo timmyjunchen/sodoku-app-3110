@@ -1,6 +1,5 @@
 open OUnit2
 open Sudoku
-open Grid
 open Command
 open State
 open Boardmaker
