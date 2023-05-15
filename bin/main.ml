@@ -27,8 +27,9 @@ let main () =
         match board_hint board with
         | Legal brd -> ("Here's a hint!", brd)
         | Illegal ->
-            ("The board is unsolvable, type \"quit\" to exit the program", board)
-        )
+            ( "The board is currently unsolvable! Check your work or type \
+               \"quit\" to exit the program",
+              board ))
     | Help ->
         ( "\n\
            \"place [row] [col] [num]\": Places a number at row and col.\n\
