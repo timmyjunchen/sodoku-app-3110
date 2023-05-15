@@ -36,12 +36,12 @@ let main () =
            \"delete [row] [col]\": Deletes a number at row and col.\n\
            \"solve\": Solves the board, not guaranteed to finish for 16x16.\n\
            \"hint\": Fills in a single number, randomly in the board.\n\
-           \"quit\": Quits the game of Sodoku.",
+           \"quit\": Quits the game of Sudoku.",
           board )
     | Quit -> Stdlib.exit 0
     | _ -> raise Command.Malformed
   and prompt str board =
-    ANSITerminal.print_string [] "\n\nHere is your Sodoku Board.\n";
+    ANSITerminal.print_string [] "\n\nHere is your Sudoku Board.\n";
     print_board board;
     if check_win board then (
       ANSITerminal.print_string [ ANSITerminal.red ] "You win!!\n";
@@ -107,7 +107,7 @@ let main () =
   and board_size_prompt () =
     ANSITerminal.print_string []
       "What size board would you like? Please enter \"small\", \"medium\", or \
-       \"large\".\n\n\
+       \"large\". Large boards might take some time to generate.\n\n\
        > ";
     match read_line () with
     | exception End_of_file -> ()
@@ -162,8 +162,8 @@ let main () =
     with Command.Malformed -> (
       ANSITerminal.print_string []
         "That is not a valid command, please enter \"play\" to play a game of \
-         Sodoku, \"solver\" to enter and solve \n\
-         a Sodoku board, or \"file\" to solve a Sodoku board in a json file. \
+         Sudoku, \"solver\" to enter and solve \n\
+         a Sudoku board, or \"file\" to solve a Sudoku board in a json file. \
          You can also enter \"quit\" to quit the program. \n\n\
          > ";
       match read_line () with
@@ -174,8 +174,8 @@ let main () =
     ANSITerminal.print_string [ ANSITerminal.red ]
       "\n\nWelcome to the Sudoku Game engine.\n\nWhat would you like to do?\n";
     ANSITerminal.print_string []
-      "Please enter \"play\" to play a game of Sodoku, \"solver\" to enter and \
-       solve a Sodoku board, or \"file\" to solve a Sodoku board in a json \
+      "Please enter \"play\" to play a game of Sudoku, \"solver\" to enter and \
+       solve a Sudoku board, or \"file\" to solve a Sudoku board in a json \
        file. You can also enter \"quit\" to quit the program. \n\n\
        > ";
     match read_line () with
