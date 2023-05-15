@@ -3,7 +3,7 @@ open State
 open Boardmaker
 (* open Command *)
 
-let board1_grid = generate_board 16 1
+let board1_grid = generate_board 16 5
 let board1 = init_state board1_grid
 
 (** [main ()] prompts for the game to play, then starts it. *)

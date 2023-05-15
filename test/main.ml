@@ -140,6 +140,11 @@ let completed_invalid_16x16grid =
     (data_dir_prefix16x16 ^ "completed_invalid_16x16grid.json")
   |> from_json
 
+let almost_comlete_16x16grid =
+  Yojson.Basic.from_file
+    (data_dir_prefix16x16 ^ "almost_complete_16x16grid.json")
+  |> from_json
+
 let start_board_test name (state : State.t) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (start_board state)
 
@@ -502,6 +507,8 @@ let state_tests16x16 =
   let board21313 = extract_state "answer" 2 13 13 board15511 in
   let board_complete = init_state completed_16x16grid in
   let board_invalid = init_state completed_invalid_16x16grid in
+  let almost_complete = init_state almost_comlete_16x16grid in
+  let almost_complete_hint = extract_state "hint" 0 0 0 almost_complete in
   [
     (*start tests*)
     start_board_test "board 1 start" board1 board1_16x16grid;
@@ -570,6 +577,46 @@ let state_tests16x16 =
     check_win_test "completed board check win" board_complete true;
     (*check win test*)
     check_win_test "completed invalid board check win" board_invalid false;
+    (*solve tests*)
+    solve_board_test "16x16 check solve" almost_complete true;
+    (*hint tests*)
+    solve_board_test "board1 check hint" almost_complete_hint true;
+  ]
+
+let delete_tests16x16 =
+  let board1 = init_state board1_16x16grid in
+  let board15511 = extract_state "answer" 15 5 11 board1 in
+  let board21313 = extract_state "answer" 2 13 13 board15511 in
+
+  [
+    (*current grid delete legal test*)
+    delete_board_test "current delete board15511 row 15 col 5" current_board 15
+      5 board15511 board1_16x16grid;
+    delete_board_test "current delete board21313 row 2 col 13" current_board 2
+      13 board21313 board15511_16x16grid;
+    (*current grid delete illegal test*)
+    delete_board_test "current board1 delete in row 17 col 2" current_board 17 2
+      board1 [||];
+    delete_board_test "current board1 delete in row 2 col 17" current_board 2 17
+      board1 [||];
+    delete_board_test "current board1 delete in row 1 col 1" current_board 1 1
+      board1 [||];
+    delete_board_test "current board15511 delete in row 3 col 3" current_board 3
+      3 board15511 [||];
+    (*start grid delete legal test*)
+    delete_board_test "start delete board15511 row 15 col 5" start_board 15 5
+      board15511 board1_16x16grid;
+    delete_board_test "start delete board21313 row 2 col 13" start_board 2 13
+      board21313 board1_16x16grid;
+    (*start grid delete illegal test*)
+    delete_board_test "start board1 delete in row -4 col 2" start_board (-4) 2
+      board1 [||];
+    delete_board_test "start board1 delete in row 2 col 0" start_board 2 0
+      board1 [||];
+    delete_board_test "start board1 delete in row 1 col 1" start_board 1 1
+      board1 [||];
+    delete_board_test "start board15511 delete in row 3 col 3" start_board 3 3
+      board15511 [||];
   ]
 
 (*****************************************************************)
@@ -617,25 +664,27 @@ let boardmaker_tests =
       [ 3; 6; 7; 9 ];
     get_options_test "get options test_board 4 3" get_options test_board 4 3
       [ 4; 5; 7; 9 ];
-    (*generate board tests*)
+    (*generate board tests not empty*)
     generate_board_test "board generate test 4 1" 4 1 true;
-    generate_board_test "board generate test 4 2" 4 2 true;
     generate_board_test "board generate test 4 3" 4 3 true;
+    generate_board_test "board generate test 4 5" 4 5 true;
     generate_board_test "board generate test 9 1" 9 1 true;
-    generate_board_test "board generate test 9 2" 9 2 true;
     generate_board_test "board generate test 9 3" 9 3 true;
+    generate_board_test "board generate test 9 5" 9 5 true;
+    (*generate board tests solvable*)
     generate_board_solve_test "board generate 4 1 solvable" 4 1 true;
-    generate_board_solve_test "board generate 4 2 solvable" 4 2 true;
     generate_board_solve_test "board generate 4 3 solvable" 4 3 true;
+    generate_board_solve_test "board generate 4 5 solvable" 4 5 true;
     generate_board_solve_test "board generate 9 1 solvable" 9 1 true;
-    generate_board_solve_test "board generate 9 2 solvable" 9 2 true;
     generate_board_solve_test "board generate 9 3 solvable" 9 3 true;
+    generate_board_solve_test "board generate 9 5 solvable" 9 5 true;
+    (*generate board tests not solved*)
     generate_board_not_solved_test "board generate 4 1 solved" 4 1 false;
-    generate_board_not_solved_test "board generate 4 2 solved" 4 2 false;
     generate_board_not_solved_test "board generate 4 3 solved" 4 3 false;
+    generate_board_not_solved_test "board generate 4 5 solved" 4 5 false;
     generate_board_not_solved_test "board generate 9 1 solved" 9 1 false;
-    generate_board_not_solved_test "board generate 9 2 solved" 9 2 false;
     generate_board_not_solved_test "board generate 9 3 solved" 9 3 false;
+    generate_board_not_solved_test "board generate 9 5 solved" 9 5 false;
   ]
 
 let suite =
@@ -647,6 +696,7 @@ let suite =
            state_tests4x4;
            delete_tests9x9;
            delete_tests4x4;
+           delete_tests16x16;
            state_tests16x16;
            boardmaker_tests;
          ]
