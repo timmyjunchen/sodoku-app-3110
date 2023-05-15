@@ -671,6 +671,7 @@ let boardmaker_tests =
     generate_board_test "board generate test 9 1" 9 1 true;
     generate_board_test "board generate test 9 3" 9 3 true;
     generate_board_test "board generate test 9 5" 9 5 true;
+    generate_board_test "board generate test 16 3" 16 3 true;
     (*generate board tests solvable*)
     generate_board_solve_test "board generate 4 1 solvable" 4 1 true;
     generate_board_solve_test "board generate 4 3 solvable" 4 3 true;
