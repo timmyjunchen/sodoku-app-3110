@@ -235,13 +235,30 @@ let board_hint board =
       solve_board
         { start_board = board.start_board; current_board = solve_temp }
     in
-    Random.self_init ();
-    let row = ref (Random.int board_size) in
-    let col = ref (Random.int board_size) in
-    while board.current_board.(!row).(!col) <> 0 do
-      row := Random.int board_size;
-      col := Random.int board_size
+
+    let board_copy = board.current_board in
+    let solution = current_board solved in
+    let replaced = ref false in
+    for row = 0 to board_size - 1 do
+      for col = 0 to board_size - 1 do
+        if
+          board_copy.(row).(col) <> 0
+          && board_copy.(row).(col) <> solution.(row).(col)
+        then (
+          board.current_board.(row).(col) <- solution.(row).(col);
+          replaced := true)
+      done
     done;
-    board.current_board.(!row).(!col) <- solved.current_board.(!row).(!col);
+
+    if not !replaced then (
+      Random.self_init ();
+      let row = ref (Random.int board_size) in
+      let col = ref (Random.int board_size) in
+      while board.current_board.(!row).(!col) <> 0 do
+        row := Random.int board_size;
+        col := Random.int board_size
+      done;
+      board.current_board.(!row).(!col) <- solved.current_board.(!row).(!col));
+
     Legal board
   with UnsolvableBoard -> Illegal
