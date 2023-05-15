@@ -137,6 +137,7 @@ let main () =
        > ";
     match read_line () with
     | exception End_of_file -> ()
+    | "quit" -> Stdlib.exit 0
     | path ->
         time := Unix.time ();
         prompt "" (init_state (Yojson.Basic.from_file path |> from_json))
