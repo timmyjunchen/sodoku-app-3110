@@ -148,12 +148,14 @@ let main () =
       | PlayMode -> board_size_prompt ()
       | SolveMode -> solver ()
       | FileMode -> file_parser ()
+      | Quit -> Stdlib.exit 0
       | _ -> raise Command.Malformed
     with Command.Malformed -> (
       ANSITerminal.print_string []
         "That is not a valid command, please enter \"play\" to play a game of \
          Sodoku, \"solver\" to enter and solve \n\
-         a Sodoku board, or \"file\" to solve a Sodoku board in a json file.\n\n\
+         a Sodoku board, or \"file\" to solve a Sodoku board in a json file. \
+         You can also enter \"quit\" to quit the program. \n\n\
          > ";
       match read_line () with
       | exception End_of_file -> ()
@@ -165,7 +167,7 @@ let main () =
     ANSITerminal.print_string []
       "Please enter \"play\" to play a game of Sodoku, \"solver\" to enter and \
        solve a Sodoku board, or \"file\" to solve a Sodoku board in a json \
-       file.\n\n\
+       file. You can also enter \"quit\" to quit the program. \n\n\
        > ";
     match read_line () with
     | exception End_of_file -> ()
