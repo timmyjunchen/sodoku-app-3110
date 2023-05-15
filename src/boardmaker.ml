@@ -2,14 +2,6 @@ open State
 
 let empty_board dim = Array.make_matrix dim dim 0
 
-let shuffle lst =
-  Random.self_init ();
-  let assoc = List.map (fun e -> (Random.int 10000000, e)) lst in
-  let shuffled =
-    List.sort (fun e1 e2 -> if fst e1 < fst e2 then -1 else 1) assoc
-  in
-  List.map (fun e -> snd e) shuffled
-
 let board_filled board =
   let filled = ref true in
   let pos = ref 0 in
