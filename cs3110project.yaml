@@ -22,7 +22,7 @@ demo-video-url: ""
 # Write a short, attention-grabbing description of your project.
 desc: >
 
-  Our project is an interactive sudoku board. It supports multiple difficulties 
+  Our project is a sudoku board. It supports multiple difficulties 
   (easy, medium, hard) and board sizes (4x4, 9x9, 16x16). Through the CLI, 
   users can select the cell they wish to fill and the number with which to fill
   it. If users are stuck, they can call for a hint which will provide the next

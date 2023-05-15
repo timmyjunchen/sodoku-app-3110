@@ -32,7 +32,8 @@ type coordinates = {
 
 (** The type [command] represents a player command that is decomposed into a
     verb and possibly a move phrase or coordinates. Invariant: the [move_phrase]
-    carried by [Go] and the [coordinates] carred by [Delete] must not be empty. *)
+    carried by [Move] and the [coordinates] carred by [Delete] must not be
+    empty. *)
 type command =
   | Move of move_phrase
   | Delete of coordinates
