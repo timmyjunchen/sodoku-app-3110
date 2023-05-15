@@ -92,7 +92,7 @@ let main () =
         prompt "" (init_state (generate_board size 3))
     | "hard" ->
         time := Unix.time ();
-        prompt "" (init_state (generate_board size 10))
+        prompt "" (init_state (generate_board size 5))
     | "back" -> board_size_prompt ()
     | "quit" -> Stdlib.exit 0
     | _ ->
@@ -120,14 +120,13 @@ let main () =
   in
   let solver () =
     ANSITerminal.print_string []
-      "What size board do you want to solve? Please enter \"small\"for a 4x4, \
-       \"medium\" for a 9x9, or \"large\" for a 16x16.\n\n\
+      "What size board do you want to solve? Please enter \"small\" for a 4x4 \
+       or \"medium\" for a 9x9 board.\n\n\
        > ";
     match read_line () with
     | exception End_of_file -> ()
     | "small" -> board_enter_mode 4
     | "medium" -> board_enter_mode 9
-    | "large" -> board_enter_mode 16
     | "quit" -> Stdlib.exit 0
     | _ -> ANSITerminal.print_string [] "That is an invalid input \n\n"
   in
@@ -148,12 +147,14 @@ let main () =
       | PlayMode -> board_size_prompt ()
       | SolveMode -> solver ()
       | FileMode -> file_parser ()
+      | Quit -> Stdlib.exit 0
       | _ -> raise Command.Malformed
     with Command.Malformed -> (
       ANSITerminal.print_string []
         "That is not a valid command, please enter \"play\" to play a game of \
          Sodoku, \"solver\" to enter and solve \n\
-         a Sodoku board, or \"file\" to solve a Sodoku board in a json file.\n\n\
+         a Sodoku board, or \"file\" to solve a Sodoku board in a json file. \
+         You can also enter \"quit\" to quit the program. \n\n\
          > ";
       match read_line () with
       | exception End_of_file -> ()
@@ -165,7 +166,7 @@ let main () =
     ANSITerminal.print_string []
       "Please enter \"play\" to play a game of Sodoku, \"solver\" to enter and \
        solve a Sodoku board, or \"file\" to solve a Sodoku board in a json \
-       file.\n\n\
+       file. You can also enter \"quit\" to quit the program. \n\n\
        > ";
     match read_line () with
     | exception End_of_file -> ()
