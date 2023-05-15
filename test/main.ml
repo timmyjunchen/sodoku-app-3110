@@ -602,6 +602,12 @@ let generate_board_solve_test name (dimensions : int) (difficulty : int)
     (check_win
        (solve_board (init_state (generate_board dimensions difficulty))))
 
+let generate_board_not_solved_test name (dimensions : int) (difficulty : int)
+    expected_output : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (check_win (init_state (generate_board dimensions difficulty)))
+
 let boardmaker_tests =
   [
     (*shuffle lists tests*)
@@ -624,6 +630,12 @@ let boardmaker_tests =
     generate_board_solve_test "board generate 9 1 solvable" 9 1 true;
     generate_board_solve_test "board generate 9 2 solvable" 9 2 true;
     generate_board_solve_test "board generate 9 3 solvable" 9 3 true;
+    generate_board_not_solved_test "board generate 4 1 solved" 4 1 false;
+    generate_board_not_solved_test "board generate 4 2 solved" 4 2 false;
+    generate_board_not_solved_test "board generate 4 3 solved" 4 3 false;
+    generate_board_not_solved_test "board generate 9 1 solved" 9 1 false;
+    generate_board_not_solved_test "board generate 9 2 solved" 9 2 false;
+    generate_board_not_solved_test "board generate 9 3 solved" 9 3 false;
   ]
 
 let suite =
