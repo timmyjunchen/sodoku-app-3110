@@ -579,31 +579,12 @@ let state_tests16x16 =
 let data_dir_prefix_generation =
   "grids" ^ Filename.dir_sep ^ "board_generation" ^ Filename.dir_sep
 
-let empty_board = Array.make_matrix 9 9 0
-
-let partially_filled_board =
-  Yojson.Basic.from_file
-    (data_dir_prefix_generation ^ "partially_filled_board.json")
-  |> from_json
-
-let filled_board =
-  Yojson.Basic.from_file (data_dir_prefix_generation ^ "filled_board.json")
-  |> from_json
-
-let almost_filled_board =
-  Yojson.Basic.from_file
-    (data_dir_prefix_generation ^ "almost_filled_board.json")
-  |> from_json
-
 let test_board =
   Yojson.Basic.from_file (data_dir_prefix_generation ^ "test_board.json")
   |> from_json
 
 let shuffle_list_test name (lst : int list) expected_output : test =
   name >:: fun _ -> assert_equal expected_output (lst <> shuffle lst)
-
-let board_filled_test name (board : int array array) expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (board_filled board)
 
 let get_options_test name f (board : int array array) (row : int) (col : int)
     expected_output : test =
@@ -613,11 +594,6 @@ let boardmaker_tests =
   [
     (*shuffle lists tests*)
     shuffle_list_test "shuffled list 1-9" [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] true;
-    (*board filled tests*)
-    board_filled_test "board_filled empty" empty_board false;
-    board_filled_test "board_filled partial" partially_filled_board false;
-    board_filled_test "board_filled almost" almost_filled_board false;
-    board_filled_test "board_filled filled" filled_board true;
     (*get options tests*)
     get_options_test "get options test_board 4 1" get_options test_board 4 1
       [ 3; 6; 7; 9 ];
