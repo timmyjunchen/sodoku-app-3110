@@ -91,14 +91,14 @@ let main () =
     match read_line () with
     | exception End_of_file -> ()
     | "easy" ->
-        time := Unix.time ();
-        prompt "" (init_state (generate_board size 1))
+        prompt "" (init_state (generate_board size 1));
+        time := Unix.time ()
     | "medium" ->
-        time := Unix.time ();
-        prompt "" (init_state (generate_board size 3))
+        prompt "" (init_state (generate_board size 3));
+        time := Unix.time ()
     | "hard" ->
-        time := Unix.time ();
-        prompt "" (init_state (generate_board size 5))
+        prompt "" (init_state (generate_board size 5));
+        time := Unix.time ()
     | "back" -> board_size_prompt ()
     | "quit" -> Stdlib.exit 0
     | _ ->
