@@ -85,6 +85,18 @@ let command_tests =
     parse_test " QUIT  " " QUIT  " Quit;
     (*Quit error tests *)
     parse_error_test "malformed quit" "quit 1" Malformed;
+    (*Solver tests*)
+    parse_test "solver" "solver" SolveMode;
+    (*Solver error tests *)
+    parse_error_test "malformed solver" "solver1" Malformed;
+    (*File tests*)
+    parse_test "file" "file" FileMode;
+    (*File error tests *)
+    parse_error_test "malformed file" "file 1" Malformed;
+    (*Help tests*)
+    parse_test "help" "help" Help;
+    (*Help error tests *)
+    parse_error_test "malformed help" "help 1" Malformed;
   ]
 
 (*****************************************************************)

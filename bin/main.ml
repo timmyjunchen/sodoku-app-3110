@@ -133,7 +133,8 @@ let main () =
   let file_parser () =
     ANSITerminal.print_string []
       "Please enter the file path to the board you want to use. Please make \
-       sure is in the format of a json file! \n\n\
+       sure is in the format of a json file! The board must be a 4 x 4 or 9 x \
+       9 board \n\n\
        > ";
     match read_line () with
     | exception End_of_file -> ()
