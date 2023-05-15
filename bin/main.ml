@@ -120,8 +120,8 @@ let main () =
   in
   let solver () =
     ANSITerminal.print_string []
-      "What size board do you want to solve? Please enter \"small\"for a 4x4, \
-       \"medium\" for a 9x9, or \"large\" for a 16x16.\n\n\
+      "What size board do you want to solve? Please enter \"small\" for a 4x4 \
+       or \"medium\" for a 9x9 board.\n\n\
        > ";
     match read_line () with
     | exception End_of_file -> ()
