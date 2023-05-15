@@ -19,7 +19,7 @@ let from_json json =
 
 type t = {
   start_board : int array array;
-  current_board : int array array;
+  mutable current_board : int array array;
 }
 
 exception UnsolvableBoard
@@ -195,7 +195,8 @@ let check_win board =
 
 let solve_board brd =
   let board_size = board_size brd in
-  let board_start = brd.start_board in
+  let _ = brd.current_board <- deep_copy_board brd.start_board in
+  let board_curr = brd.current_board in
   let rec helper row col board =
     if row >= board_size && col >= board_size then raise Exit;
     if board.(row).(col) == 0 then (
@@ -214,7 +215,7 @@ let solve_board brd =
       else helper row (col + 1) board)
   in
   try
-    helper 0 0 board_start;
+    helper 0 0 board_curr;
     raise UnsolvableBoard
   with Exit ->
     ();
