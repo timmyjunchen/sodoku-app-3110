@@ -140,5 +140,7 @@ let generate_board dim difficulty =
     | Division_by_zero -> ()
     | InfiniteLoop -> ()
   done;
-  let result = remove_random_positions !filled_board difficulty in
-  result
+  let result =
+    remove_random_positions (State.deep_copy_board !filled_board) difficulty
+  in
+  (!filled_board, result)
