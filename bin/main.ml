@@ -19,11 +19,16 @@ let main () =
         | Legal brd -> ("Value deleted!", brd)
         | Illegal ->
             ("\n\nCannot delete values in that cell. Try Again \n", board))
-    | Solve -> ("\n\n Here is your solved board", solve_board board)
+    | Solve -> (
+        try ("\n\n Here is your solved board", solve_board board)
+        with UnsolvableBoard ->
+          ("The board is unsolvable, type \"quit\" to exit the program", board))
     | Hint -> (
         match board_hint board with
         | Legal brd -> ("Here's a hint!", brd)
-        | Illegal -> ("The board is unsolvable", board))
+        | Illegal ->
+            ("The board is unsolvable, type \"quit\" to exit the program", board)
+        )
     | Help ->
         ( "\n\
            \"place [row] [col] [num]\": Places a number at row and col.\n\
