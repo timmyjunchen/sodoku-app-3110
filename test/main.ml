@@ -144,9 +144,13 @@ let completed_invalid_16x16grid =
     (data_dir_prefix16x16 ^ "completed_invalid_16x16grid.json")
   |> from_json
 
-let almost_comlete_16x16grid =
+let almost_complete_16x16grid =
   Yojson.Basic.from_file
     (data_dir_prefix16x16 ^ "almost_complete_16x16grid.json")
+  |> from_json
+
+let unsolvable_16x16grid =
+  Yojson.Basic.from_file (data_dir_prefix16x16 ^ "unsolvable_16x16grid.json")
   |> from_json
 
 let start_board_test name (state : State.t) expected_output : test =
@@ -197,6 +201,15 @@ let solve_board_error_test name (state : State.t) expected_error : test =
   name >:: fun _ ->
   assert_raises expected_error (fun () -> solve_board copied_state)
 
+let hint_board_test name f (state : State.t) expected_output : test =
+  let new_board =
+    let copied_state = deep_copy_state state in
+    match board_hint copied_state with
+    | Legal new_state -> f new_state
+    | Illegal -> [||] (*sudoku boards cant be empty*)
+  in
+  name >:: fun _ -> assert_equal expected_output new_board
+
 let extract_state (f : string) (row : int) (col : int) (value : int)
     (state : State.t) =
   let copied_state = deep_copy_state state in
@@ -217,8 +230,8 @@ let extract_state (f : string) (row : int) (col : int) (value : int)
       match board_hint copied_state with
       | Legal new_state -> new_state
       | Illegal ->
-          failwith "can't happen"
-          (*hint will always be legal when using this helper*))
+          failwith
+            "can't happen" (*hint will always be legal when using this helper*))
   | _ -> failwith "can't happen" (*f will always be one of above strings*)
 
 let state_tests9x9 =
@@ -330,8 +343,12 @@ let state_tests9x9 =
     (*solve error tests*)
     solve_board_error_test "board221 check not solvable" board221
       UnsolvableBoard;
-    (*hint tests*)
-    solve_board_test "board1 check hint" board1_hint true;
+    (*hint legal test*)
+    solve_board_test "board1 hint" board1_hint true;
+    (*start grid hint legal tests*)
+    hint_board_test "start board1 hint" start_board board1 board1_grid;
+    (*start grid hint illegal tests*)
+    hint_board_test "start board221 hint" start_board board221 [||];
   ]
 
 let delete_board_test name f (row : int) (col : int) (state : State.t)
@@ -469,8 +486,12 @@ let state_tests4x4 =
     (*solve error tests*)
     solve_board_error_test "unsolvable check not solvable" unsolvable
       UnsolvableBoard;
-    (*hint tests*)
-    solve_board_test "board1 check hint" board1_hint true;
+    (*hint legal test*)
+    solve_board_test "board1 hint" board1_hint true;
+    (*start grid hint legal tests*)
+    hint_board_test "start board1 hint" start_board board1 board1_4x4grid;
+    (*start grid hint illegal tests*)
+    hint_board_test "start unsolvable hint" start_board unsolvable [||];
   ]
 
 let delete_tests4x4 =
@@ -515,8 +536,9 @@ let state_tests16x16 =
   let board21313 = extract_state "answer" 2 13 13 board15511 in
   let board_complete = init_state completed_16x16grid in
   let board_invalid = init_state completed_invalid_16x16grid in
-  let almost_complete = init_state almost_comlete_16x16grid in
+  let almost_complete = init_state almost_complete_16x16grid in
   let almost_complete_hint = extract_state "hint" 0 0 0 almost_complete in
+  let unsolvable = init_state unsolvable_16x16grid in
   [
     (*start tests*)
     start_board_test "board 1 start" board1 board1_16x16grid;
@@ -587,8 +609,16 @@ let state_tests16x16 =
     check_win_test "completed invalid board check win" board_invalid false;
     (*solve tests*)
     solve_board_test "16x16 check solve" almost_complete true;
-    (*hint tests*)
-    solve_board_test "board1 check hint" almost_complete_hint true;
+    (*solve error tests*)
+    solve_board_error_test "unsolvable check not solvable" unsolvable
+      UnsolvableBoard;
+    (*hint legal test*)
+    solve_board_test "almost complete hint" almost_complete_hint true;
+    (*start grid hint legal tests*)
+    hint_board_test "start almost complete hint" start_board almost_complete
+      almost_complete_16x16grid;
+    (*start grid hint illegal tests*)
+    hint_board_test "start unsolvable hint" start_board unsolvable [||];
   ]
 
 let delete_tests16x16 =
@@ -660,6 +690,13 @@ let generate_board_not_solved_test name (dimensions : int) (difficulty : int)
   assert_equal expected_output
     (check_win (init_state (generate_board dimensions difficulty)))
 
+let generate_board_hint_test name (dimensions : int) (difficulty : int)
+    expected_output : test =
+  name >:: fun _ ->
+  let generated_board = init_state (generate_board dimensions difficulty) in
+  let hint_board = extract_state "hint" 0 0 0 generated_board in
+  assert_equal expected_output (check_win (solve_board hint_board))
+
 let boardmaker_tests =
   [
     (*get options tests*)
@@ -687,7 +724,14 @@ let boardmaker_tests =
     generate_board_not_solved_test "board generate 4 5 solved" 4 5 false;
     generate_board_not_solved_test "board generate 9 1 solved" 9 1 false;
     generate_board_not_solved_test "board generate 9 3 solved" 9 3 false;
-    generate_board_not_solved_test "board generate 9 5 solved" 9 5 false;
+    generate_board_not_solved_test "board generate 9 5 solved" 9 5 false
+    (*generate board tests hint*);
+    generate_board_hint_test "board generate 4 1 hint" 4 1 true;
+    generate_board_hint_test "board generate 4 3 hint" 4 3 true;
+    generate_board_hint_test "board generate 4 5 hint" 4 5 true;
+    generate_board_hint_test "board generate 9 1 hint" 9 1 true;
+    generate_board_hint_test "board generate 9 3 hint" 9 3 true;
+    generate_board_hint_test "board generate 9 5 hint" 9 5 true;
   ]
 
 let suite =

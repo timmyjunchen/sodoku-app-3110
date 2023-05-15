@@ -1,5 +1,8 @@
 (** Generates a board of given size and difficulty*)
 
+val shuffle : int list -> int list
+(** [shuffle lst] is [lst] with the elements of lst in random order. *)
+
 val get_options : int array array -> int -> int -> int list
 (** [get_options board row_num col_num] is the int list of possible numbers that
     can go in the cell specified by [row_num] and [col_num]. [row_num] and
