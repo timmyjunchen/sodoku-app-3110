@@ -92,7 +92,7 @@ let main () =
         prompt "" (init_state (generate_board size 3))
     | "hard" ->
         time := Unix.time ();
-        prompt "" (init_state (generate_board size 10))
+        prompt "" (init_state (generate_board size 5))
     | "back" -> board_size_prompt ()
     | "quit" -> Stdlib.exit 0
     | _ ->
@@ -127,7 +127,6 @@ let main () =
     | exception End_of_file -> ()
     | "small" -> board_enter_mode 4
     | "medium" -> board_enter_mode 9
-    | "large" -> board_enter_mode 16
     | "quit" -> Stdlib.exit 0
     | _ -> ANSITerminal.print_string [] "That is an invalid input \n\n"
   in
