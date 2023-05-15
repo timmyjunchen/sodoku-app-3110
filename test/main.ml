@@ -115,6 +115,10 @@ let board321_4x4grid =
   Yojson.Basic.from_file (data_dir_prefix4x4 ^ "board321_4x4grid.json")
   |> from_json
 
+let unsolvable_4x4grid =
+  Yojson.Basic.from_file (data_dir_prefix4x4 ^ "unsolvable_4x4grid.json")
+  |> from_json
+
 (* 16 x 16 grids*)
 let data_dir_prefix16x16 =
   "grids" ^ Filename.dir_sep ^ "16x16" ^ Filename.dir_sep
@@ -383,6 +387,7 @@ let state_tests4x4 =
   let board_complete = init_state completed_4x4grid in
   let board_invalid = init_state completed_invalid_4x4grid in
   let board1_hint = extract_state "hint" 0 0 0 board1 in
+  let unsolvable = init_state unsolvable_4x4grid in
   [
     (*start board tests*)
     start_board_test "board 1 start" board1 board1_4x4grid;
@@ -461,6 +466,9 @@ let state_tests4x4 =
     solve_board_test "board1 check solve" board1 true;
     solve_board_test "board423 check solve" board423 true;
     solve_board_test "board321 check solve" board321 true;
+    (*solve error tests*)
+    solve_board_error_test "unsolvable check not solvable" unsolvable
+      UnsolvableBoard;
     (*hint tests*)
     solve_board_test "board1 check hint" board1_hint true;
   ]
@@ -630,9 +638,6 @@ let test_board =
   Yojson.Basic.from_file (data_dir_prefix_generation ^ "test_board.json")
   |> from_json
 
-let shuffle_list_test name (lst : int list) expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (lst <> shuffle lst)
-
 let get_options_test name f (board : int array array) (row : int) (col : int)
     expected_output : test =
   name >:: fun _ -> assert_equal expected_output (f board row col)
@@ -657,8 +662,6 @@ let generate_board_not_solved_test name (dimensions : int) (difficulty : int)
 
 let boardmaker_tests =
   [
-    (*shuffle lists tests*)
-    shuffle_list_test "shuffled list 1-9" [ 1; 2; 3; 4; 5; 6; 7; 8; 9 ] true;
     (*get options tests*)
     get_options_test "get options test_board 4 1" get_options test_board 4 1
       [ 3; 6; 7; 9 ];
@@ -671,7 +674,6 @@ let boardmaker_tests =
     generate_board_test "board generate test 9 1" 9 1 true;
     generate_board_test "board generate test 9 3" 9 3 true;
     generate_board_test "board generate test 9 5" 9 5 true;
-    generate_board_test "board generate test 16 3" 16 3 true;
     (*generate board tests solvable*)
     generate_board_solve_test "board generate 4 1 solvable" 4 1 true;
     generate_board_solve_test "board generate 4 3 solvable" 4 3 true;

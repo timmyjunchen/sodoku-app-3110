@@ -1,5 +1,4 @@
-val shuffle : int list -> int list
-(** [shuffle lst] is [lst] with the elements of lst in random order. *)
+(** Generates a board of given size and difficulty*)
 
 val get_options : int array array -> int -> int -> int list
 (** [get_options board row_num col_num] is the int list of possible numbers that
