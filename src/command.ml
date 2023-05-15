@@ -12,6 +12,7 @@ type move_phrase = {
 type command =
   | Move of move_phrase
   | Delete of coordinates
+  | Options of coordinates
   | Solve
   | Hint
   | Quit
@@ -47,6 +48,11 @@ let parse (str : string) : command =
       let vals = list_to_string t in
       match List.length vals with
       | 2 -> Delete { row = List.nth vals 0; col = List.nth vals 1 }
+      | _ -> raise Malformed)
+  | "options" :: t -> (
+      let vals = list_to_string t in
+      match List.length vals with
+      | 2 -> Options { row = List.nth vals 0; col = List.nth vals 1 }
       | _ -> raise Malformed)
   | [ "solve" ] -> Solve
   | [ "hint" ] -> Hint

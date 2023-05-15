@@ -19,6 +19,14 @@ let main () =
         | Legal brd -> ("Value deleted!", brd)
         | Illegal ->
             ("\n\nCannot delete values in that cell. Try Again \n", board))
+    | Options coords ->
+        let rslt = get_options (current_board board) coords.row coords.col in
+        if List.length rslt == 0 then ("There are no options\n", board)
+        else
+          let str =
+            List.fold_left (fun y x -> string_of_int x ^ " " ^ y) "" rslt
+          in
+          ("Here are the options:\n" ^ str ^ "\n", board)
     | Solve -> (
         try ("\n\n Here is your solved board", solve_board board)
         with UnsolvableBoard ->
@@ -34,6 +42,8 @@ let main () =
         ( "\n\
            \"place [row] [col] [num]\": Places a number at row and col.\n\
            \"delete [row] [col]\": Deletes a number at row and col.\n\
+           \"options [row] [col]\": Gives a list of number options at row and \
+           col \n\
            \"solve\": Solves the board, not guaranteed to finish for 16x16.\n\
            \"hint\": Fills in a single number, randomly in the board.\n\
            \"quit\": Quits the game of Sudoku.",
@@ -96,6 +106,14 @@ let main () =
         | Legal brd -> ("Value deleted!", brd)
         | Illegal ->
             ("\n\nCannot delete values in that cell. Try Again \n", board))
+    | Options coords ->
+        let rslt = get_options (current_board board) coords.row coords.col in
+        if List.length rslt == 0 then ("There are no options\n", board)
+        else
+          let str =
+            List.fold_left (fun y x -> string_of_int x ^ " " ^ y) "" rslt
+          in
+          ("Here are the options:\n" ^ str ^ "\n", board)
     | Solve -> (
         try
           ( "\n\n Here is your solved board",
@@ -113,6 +131,8 @@ let main () =
         ( "\n\
            \"place [row] [col] [num]\": Places a number at row and col.\n\
            \"delete [row] [col]\": Deletes a number at row and col.\n\
+           \"options [row] [col]\": Gives a list of number options at row and \
+           col \n\
            \"solve\": Solves the board, not guaranteed to finish for 16x16.\n\
            \"hint\": Fills in a single number, randomly in the board.\n\
            \"quit\": Quits the game of Sudoku.",

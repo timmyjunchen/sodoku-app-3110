@@ -37,6 +37,7 @@ type coordinates = {
 type command =
   | Move of move_phrase
   | Delete of coordinates
+  | Options of coordinates
   | Solve
   | Hint
   | Quit
