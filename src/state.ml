@@ -51,12 +51,18 @@ let block_size st = int_of_float (sqrt (float_of_int (board_size st)))
 let print_board (st : t) : unit =
   let board_size = board_size st in
   let block_size = block_size st in
+  let num_digits_of_int i = String.length (string_of_int i) in
+  let num_digits = num_digits_of_int board_size in
+
   let _ = print_endline "" in
   let string_of_row (row : int array) : string =
     let temp =
       Array.mapi
         (fun i cell ->
-          (if cell <> 0 then string_of_int cell else ".")
+          (if cell <> 0 then
+           String.make (num_digits - num_digits_of_int cell) ' '
+           ^ string_of_int cell
+          else String.make (num_digits - num_digits_of_int cell) ' ' ^ ".")
           ^
           if (i + 1) mod block_size = 0 && i <> 0 && i <> board_size - 1 then
             " | "
