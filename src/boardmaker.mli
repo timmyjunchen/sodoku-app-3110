@@ -8,7 +8,7 @@ val get_options : int array array -> int -> int -> int list
     can go in the cell specified by [row_num] and [col_num]. [row_num] and
     [col_num] begin with index 1, not 0. *)
 
-val generate_board : int -> int -> int array array * int array array
+val generate_board : int -> int -> int array array
 (** [generate_board dim difficulty] is the sudoku board solution and the initial
     board (positions removed) with size [dim] and difficulty [difficulty]. The
     first board is the filled in board (the solution) and the second board is

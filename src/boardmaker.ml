@@ -143,4 +143,4 @@ let generate_board dim difficulty =
   let result =
     remove_random_positions (State.deep_copy_board !filled_board) difficulty
   in
-  (!filled_board, result)
+  result
