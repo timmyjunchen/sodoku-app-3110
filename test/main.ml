@@ -1,3 +1,28 @@
+(** Testing plan
+
+    For our Ounit testing, all the features in boardmaker, command, and state
+    were tested through the ounit for grid sizes of 4x4, 9x9 (2/3 of the
+    playable grids). For 16 x 16 grids (the last playable grid), most of the
+    functions were tested except for solve and hint as checking if the solved
+    board is a valid win takes a lot longer and we wanted our test suite to run
+    under a second.
+
+    For our tests, we used glass box testing for all the modules to test the
+    different branches of our functions. We implemented this by testing not only
+    the "typical" test cases but also any fringe cases to make sure our
+    functions worked for any sudoku board. For example, for commands, we made
+    sure to test inputs with normal spacing between words, random
+    capitalization, and random spacing to make sure our game works, even if the
+    user might have mistyped some of their inputs.
+
+    This methodology demonstrates the correctness of the system because by
+    testing the typical and fringe cases, we make sure our system works for any
+    random board generated which is important so that the user can always reach
+    a completed board. Additionally, by testing for correctness in all our
+    functions in all our modules, we can make sure that no errors occur in any
+    step our game, whether that is board generation, parsing commands, or
+    updating the board/game logic*)
+
 open OUnit2
 open Sudoku
 open Command
