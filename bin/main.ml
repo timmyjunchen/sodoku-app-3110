@@ -83,6 +83,85 @@ let main () =
                Make sure to style commands in the form of 'place row col val', \
                'delete row col', or 'quit'"
               board))
+  and play_solver board (cmd : Command.command) =
+    match cmd with
+    | Move phrase -> (
+        let rslt = answer phrase.row phrase.col phrase.value board in
+        match rslt with
+        | Legal brd -> ("Valid move. Nice!", brd)
+        | Illegal -> ("\n\nMove is Illegal, please try again. \n", board))
+    | Delete coords -> (
+        let rslt = delete coords.row coords.col board in
+        match rslt with
+        | Legal brd -> ("Value deleted!", brd)
+        | Illegal ->
+            ("\n\nCannot delete values in that cell. Try Again \n", board))
+    | Solve -> (
+        try
+          ( "\n\n Here is your solved board",
+            solve_board (init_state (current_board board)) )
+        with UnsolvableBoard ->
+          ("The board is unsolvable, type \"quit\" to exit the program", board))
+    | Hint -> (
+        match board_hint board with
+        | Legal brd -> ("Here's a hint!", brd)
+        | Illegal ->
+            ( "The board is currently unsolvable! Check your work or type \
+               \"quit\" to exit the program",
+              board ))
+    | Help ->
+        ( "\n\
+           \"place [row] [col] [num]\": Places a number at row and col.\n\
+           \"delete [row] [col]\": Deletes a number at row and col.\n\
+           \"solve\": Solves the board, not guaranteed to finish for 16x16.\n\
+           \"hint\": Fills in a single number, randomly in the board.\n\
+           \"quit\": Quits the game of Sudoku.",
+          board )
+    | Quit -> Stdlib.exit 0
+    | _ -> raise Command.Malformed
+  and prompt_solver str board =
+    ANSITerminal.print_string [] "\n\nHere is your Sudoku Board.\n";
+    print_board board;
+    if check_win board then (
+      ANSITerminal.print_string [ ANSITerminal.red ] "You win!!\n";
+      ANSITerminal.print_string [ ANSITerminal.blue ]
+        ("It took you "
+        ^ string_of_float (Unix.time () -. !time)
+        ^ " seconds to solve the puzzle. Good job!\n");
+      ANSITerminal.print_string []
+        "What would you like to do now?\n\
+         Type \"play\" to play again or \"quit\" to quit\n\n\
+         >";
+      match read_line () with
+      | exception End_of_file -> ()
+      | "play" -> board_size_prompt ()
+      | "quit" -> exit 0
+      | _ ->
+          ANSITerminal.print_string []
+            "Invalid input, I assume you quit. Good job though!\n";
+          exit 0)
+    else (
+      ANSITerminal.print_string [ ANSITerminal.red ] str;
+      print_endline
+        "\n\
+         Please enter what move you want to make! To answer, type place [row] \
+         [col] [answer]\n";
+      print_endline "Type \"help\" for a list of all commands! \n";
+      print_string "> ";
+      match read_line () with
+      | exception End_of_file -> ()
+      | str -> (
+          try
+            let x = Command.parse str |> play_solver board in
+            match x with
+            | str, brd -> prompt_solver str brd
+          with Command.Malformed ->
+            prompt_solver
+              "\n\n\
+               That is not a valid command \n\
+               Make sure to style commands in the form of 'place row col val', \
+               'delete row col', or 'quit'"
+              board))
   and board_difficulty_prompt size =
     ANSITerminal.print_string []
       "What difficulty would you like? Please enter \"easy\", \"medium\", \
@@ -122,7 +201,7 @@ let main () =
   let board_enter_mode size =
     let board = init_state (Array.make_matrix size size 0) in
     time := Unix.time ();
-    prompt "" board
+    prompt_solver "" board
   in
   let solver () =
     ANSITerminal.print_string []
