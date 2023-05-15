@@ -130,7 +130,7 @@ let main () =
     | "quit" -> Stdlib.exit 0
     | _ -> ANSITerminal.print_string [] "That is an invalid input \n\n"
   in
-  let file_parser () =
+  let rec file_parser () =
     ANSITerminal.print_string []
       "Please enter the file path to the board you want to use. Please make \
        sure is in the format of a json file! The board must be a 4 x 4 or 9 x \
@@ -140,8 +140,10 @@ let main () =
     | exception End_of_file -> ()
     | "quit" -> Stdlib.exit 0
     | path ->
-        time := Unix.time ();
-        prompt "" (init_state (Yojson.Basic.from_file path |> from_json))
+        (time := Unix.time ();
+         try prompt "" (init_state (Yojson.Basic.from_file path |> from_json))
+         with Sys_error e -> ANSITerminal.print_string [] (e ^ "\n"));
+        file_parser ()
   in
   let rec parse_begin str =
     try
