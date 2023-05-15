@@ -1,4 +1,4 @@
-(** Generates a board of given size and difficulty*)
+(** Generates a board of given size and difficulty *)
 
 val shuffle : int list -> int list
 (** [shuffle lst] is [lst] with the elements of lst in random order. *)
