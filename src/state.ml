@@ -95,13 +95,9 @@ let get_block (st : t) ((blockrow, blockcol) : int * int) : int array =
         let col_value = ((blockcol - 1) * block_edge) + (cell mod block_edge) in
         (current_board st).(row_value).(col_value))
   in
-  (* let _ = print_endline (List.fold_left (fun acc x -> acc ^ string_of_int x)
-     "" (result |> Array.to_list)) in *)
   result
 
 let get_cell (st : t) ((row, col) : int * int) : int =
-  (* let _ = print_endline (string_of_int row ^ string_of_int col) in let _ =
-     print_endline (string_of_int (current_board st).(1).(1)) in *)
   (current_board st).(row - 1).(col - 1)
 
 let check_input input state = 1 <= input && input <= board_size state
@@ -116,7 +112,6 @@ let replace_value (board : int array array) ((row, col) : int * int)
 
 let next_grid st row col value =
   let current_board = current_board st in
-  let _ = print_board st in
   match get_cell st (row, col) with
   | 0 -> begin
       match check_input value st with
@@ -241,7 +236,5 @@ let board_hint board =
       col := Random.int board_size
     done;
     board.current_board.(!row).(!col) <- solved.current_board.(!row).(!col);
-    print_endline (string_of_int board.current_board.(!row).(!col));
-    print_board solved;
     Legal board
   with UnsolvableBoard -> Illegal

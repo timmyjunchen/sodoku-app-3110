@@ -13,4 +13,4 @@ val generate_board : int -> int -> int array array
     difficulty [difficulty]. The higher the difficulty, the fewer pre-filled
     position on the board. Each call to [generate_board] produces a unique
     board. Requires: [dim] is a square number greater than 1 (e.g 4, 9, 16,
-    ...). [difficulty] is a number between 1 and 3, inclusive. *)
+    ...). [difficulty] is a number between 1 and 5, inclusive. *)

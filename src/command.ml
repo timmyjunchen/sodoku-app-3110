@@ -15,6 +15,10 @@ type command =
   | Solve
   | Hint
   | Quit
+  | PlayMode
+  | SolveMode
+  | FileMode
+  | Help
 
 exception Empty
 exception Malformed
@@ -47,4 +51,8 @@ let parse (str : string) : command =
   | [ "solve" ] -> Solve
   | [ "hint" ] -> Hint
   | [ "quit" ] -> Quit
+  | [ "play" ] -> PlayMode
+  | [ "solver" ] -> SolveMode
+  | [ "file" ] -> FileMode
+  | [ "help" ] -> Help
   | _ -> raise Malformed

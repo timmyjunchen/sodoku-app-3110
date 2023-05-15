@@ -39,6 +39,10 @@ type command =
   | Solve
   | Hint
   | Quit
+  | PlayMode
+  | SolveMode
+  | FileMode
+  | Help
 
 exception Empty
 (** Raised when an empty command is parsed. *)
