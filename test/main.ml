@@ -590,6 +590,18 @@ let get_options_test name f (board : int array array) (row : int) (col : int)
     expected_output : test =
   name >:: fun _ -> assert_equal expected_output (f board row col)
 
+let generate_board_test name (dimensions : int) (difficulty : int)
+    expected_output : test =
+  name >:: fun _ ->
+  assert_equal expected_output ([||] <> generate_board dimensions difficulty)
+
+let generate_board_solve_test name (dimensions : int) (difficulty : int)
+    expected_output : test =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (check_win
+       (solve_board (init_state (generate_board dimensions difficulty))))
+
 let boardmaker_tests =
   [
     (*shuffle lists tests*)
@@ -599,7 +611,19 @@ let boardmaker_tests =
       [ 3; 6; 7; 9 ];
     get_options_test "get options test_board 4 3" get_options test_board 4 3
       [ 4; 5; 7; 9 ];
-    ({|generate_board|} >:: fun _ -> assert (generate_board 9 3 <> [| [||] |]));
+    (*generate board tests*)
+    generate_board_test "board generate test 4 1" 4 1 true;
+    generate_board_test "board generate test 4 2" 4 2 true;
+    generate_board_test "board generate test 4 3" 4 3 true;
+    generate_board_test "board generate test 9 1" 9 1 true;
+    generate_board_test "board generate test 9 2" 9 2 true;
+    generate_board_test "board generate test 9 3" 9 3 true;
+    generate_board_solve_test "board generate 4 1 solvable" 4 1 true;
+    generate_board_solve_test "board generate 4 2 solvable" 4 2 true;
+    generate_board_solve_test "board generate 4 3 solvable" 4 3 true;
+    generate_board_solve_test "board generate 9 1 solvable" 9 1 true;
+    generate_board_solve_test "board generate 9 2 solvable" 9 2 true;
+    generate_board_solve_test "board generate 9 3 solvable" 9 3 true;
   ]
 
 let suite =
