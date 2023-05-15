@@ -6,3 +6,11 @@ $ opam upgrade
 
 install ANSITerminal by typing the following in the command line
 $ opam install ANSITerminal
+
+to run the program type the following in the command line
+$ make play
+
+after the game starts, follow the prompts in the command line
+
+to quit the game type 
+> quit

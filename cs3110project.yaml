@@ -23,9 +23,8 @@ demo-video-url: ""
 desc: >
 
   Our project is an interactive sudoku board. It supports multiple difficulties 
-  (easy, medium, hard) which are auto generated randomly 
-  and will have a working interface where users can select
-  the cell they wish to fill. There is also a hint feature in case users are
-  stuck which will provide clues about which cells/numbers to focus on. There 
-  will also be a solver in case people want to see the solution or input their 
-  own boards. 
+  (easy, medium, hard) and board sizes (4x4, 9x9, 16x16). Through the CLI, 
+  users can select the cell they wish to fill and the number with which to fill
+  it. If users are stuck, they can call for a hint which will provide the next
+  step for solving the board. For users that want the boars solved, they can 
+  manually input a board or load one from the local filesystem to be solved. 
